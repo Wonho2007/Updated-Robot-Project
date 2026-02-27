@@ -4,6 +4,7 @@
 #include <FEHMotor.h>
 
 // Declarations for encoders & motors
+//Hello
 DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
