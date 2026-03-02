@@ -4,12 +4,11 @@
 #include <FEHMotor.h>
 
 // Declarations for encoders & motors
-// Hello
 DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
-// hi
+
 enum
 {
     MIDDLE,
@@ -17,25 +16,34 @@ enum
     RIGHT
 };
 
+// Assumes percent > 0
 void drive(int percent, int inches) // using encoders
 {
+    const float countsPerInch = 40.5;
+
     if (inches == 0)
     {
         // Set both motors to desired percent
         right_motor.SetPercent(percent);
         left_motor.SetPercent(percent);
 
-        //while(input)
+        // while(input)
 
         right_motor.Stop();
         left_motor.Stop();
     }
     else
     {
-        int counts = 40.5 * inches;
+        int counts = countsPerInch * abs(inches);
         // Reset encoder counts
         right_encoder.ResetCounts();
         left_encoder.ResetCounts();
+
+        // If driving backwards, set negative percent
+        if (inches < 0)
+        {
+            percent = -1 * percent;
+        }
 
         // Set both motors to desired percent
         right_motor.SetPercent(percent);
@@ -43,8 +51,8 @@ void drive(int percent, int inches) // using encoders
 
         // While the average of the left and right encoder is less than counts,
         // keep running motors
-        while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts);
-            
+        while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
+            ;
 
         // Turn off motors
         right_motor.Stop();
@@ -52,71 +60,93 @@ void drive(int percent, int inches) // using encoders
     }
 }
 
-void turn_right(int percent, int counts) // using encoders
+// Assumes percent > 0;
+void turnCenter(int percent, int degrees) // Positive degrees turns right. Negative turns left.
 
 {
+    // Find counts needed for degrees
+    const float countsPerDegrees = 20.42 / (360 * 40.5);
+    int counts = abs(degrees) * countsPerDegrees;
 
     // Reset encoder counts
-
     right_encoder.ResetCounts();
-
     left_encoder.ResetCounts();
-
-    // Set both motors to desired percent
-    right_motor.SetPercent(-percent);
-    left_motor.SetPercent(-percent);
-    // hint: set right motor backwards, left motor forwards
-
-    //<ADD CODE HERE>
-
-    // While the average of the left and right encoder is less than counts,
-    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
-        ;
-    // keep running motors
-
-    //<ADD CODE HERE>
-
-    // Turn off motors
-
+    left_motor.Stop();
     right_motor.Stop();
 
+    // If degrees is positive, turn to right. If negative, turn left
+    if (degrees > 0)
+    {
+        // Set both motors to desired percent
+        right_motor.SetPercent(-percent);
+        left_motor.SetPercent(percent);
+    }
+    else
+    {
+        // Set both motors to desired percent
+        right_motor.SetPercent(percent);
+        left_motor.SetPercent(-percent);
+    }
+
+    // Wait until the average of the left and right encoder is less than counts
+    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
+        ;
+
+    right_motor.Stop();
     left_motor.Stop();
 }
 
-void turn_left(int percent, int counts) // using encoders
+// Assumes percent > 0;
+void turnAboutWheel(int percent, int degrees, char wheelPivot) // using encoders
 
 {
+    // Find counts needed for degrees
+    const float countsPerDegrees = 40.841 / (360 * 40.5);
+    int counts = abs(degrees) * countsPerDegrees;
 
     // Reset encoder counts
-
     right_encoder.ResetCounts();
-
     left_encoder.ResetCounts();
-
-    // Set both motors to desired percent
-    right_motor.SetPercent(percent);
-    left_motor.SetPercent(percent);
-    // hint: set right motor backwards, left motor forwards
-
-    //<ADD CODE HERE>
-
-    // While the average of the left and right encoder is less than counts,
-    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
-        ;
-    // keep running motors
-
-    //<ADD CODE HERE>
-
-    // Turn off motors
-
+    left_motor.Stop();
     right_motor.Stop();
 
+    // Check which wheel is pivot
+    if (wheelPivot == 'R')
+    {
+        // If degrees is positive, turn to right. If negative, turn left
+        if (degrees < 0)
+        {
+            percent = -1 * percent;
+        }
+
+        left_motor.SetPercent(percent);
+    }
+    else if (wheelPivot == 'L')
+    {
+        // If degrees is positive, turn to right. If negative, turn left
+        if (degrees < 0)
+        {
+            percent = -1 * percent;
+        }
+
+        right_motor.SetPercent(percent);
+    }
+    else
+    {
+        LCD.Write("Not valid pivot");
+    }
+
+    // Wait until the average of the left and right encoder is less than counts
+    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
+        ;
+
+    right_motor.Stop();
     left_motor.Stop();
 }
 
 void ERCMain()
 {
-    int motor_percent = 25; // Input power level here
+    const int motor_percent = 25; // Input power level here
 
     int x, y; // for touch screen
 
