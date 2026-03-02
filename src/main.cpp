@@ -17,8 +17,9 @@ enum
     RIGHT
 };
 
-void move_forward(int percent, int counts) // using encoders
+void drive(int percent, int inches) // using encoders
 {
+    int counts = 40.5 * inches;
     // Reset encoder counts
     right_encoder.ResetCounts();
     left_encoder.ResetCounts();
@@ -102,11 +103,6 @@ void turn_left(int percent, int counts) // using encoders
 void ERCMain()
 {
     int motor_percent = 25;             // Input power level here
-    int expected_counts_fourteen = 567; // Input theoretical counts here
-    int expected_counts_ten = 405;
-    int expected_counts_four = 162;
-    int expected_counts_right_turn = 239;
-    int expected_counts_left_turn = 239;
 
     int x, y; // for touch screen
 
@@ -121,15 +117,6 @@ void ERCMain()
     while (LCD.Touch(&x, &y))
         ; // Wait for screen to be unpressed
 
-    move_forward(motor_percent, expected_counts_fourteen);
-    Sleep(2.0);
-    turn_left(motor_percent, expected_counts_left_turn);
-    Sleep(2.0);
-    move_forward(motor_percent, expected_counts_ten);
-    Sleep(2.0);
-    turn_right(motor_percent, expected_counts_right_turn);
-    Sleep(2.0);
-    move_forward(motor_percent, expected_counts_four);
 
     Sleep(2.0); // Wait for counts to stabilize
 }
