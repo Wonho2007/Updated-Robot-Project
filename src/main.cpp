@@ -144,6 +144,7 @@ void turnAboutWheel(int percent, int degrees, char wheelPivot) // using encoders
     left_motor.Stop();
 }
 
+
 void ERCMain()
 {
     const int motor_percent = 25; // Input power level here
@@ -154,14 +155,37 @@ void ERCMain()
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
 
-    LCD.WriteLine("Shaft Encoder Exploration Test");
     LCD.WriteLine("Touch the screen");
     while (!LCD.Touch(&x, &y))
         ; // Wait for screen to be pressed
     while (LCD.Touch(&x, &y))
         ; // Wait for screen to be unpressed
 
+    drive(motor_percent, 36);
     Sleep(2.0); // Wait for counts to stabilize
+
+    LCD.WriteLine("Touch the screen");
+    while (!LCD.Touch(&x, &y))
+        ; // Wait for screen to be pressed
+    while (LCD.Touch(&x, &y))
+        ; // Wait for screen to be unpressed
+
+    drive(motor_percent, -36);
+
+    Sleep(2.0);
+
+    turnCenter(motor_percent, 90);
+    Sleep(2.0);
+    turnCenter(motor_percent, -90);
+    Sleep(2.0);
+    turnAboutWheel(motor_percent, 90, 'R');
+    Sleep(2.0);
+    turnAboutWheel(motor_percent, -90, 'R');
+    Sleep(2.0);
+    turnAboutWheel(motor_percent, 90, 'L');
+    Sleep(2.0);
+    turnAboutWheel(motor_percent, -90, 'L');
+    Sleep(2.0);
 }
 
 void lineFolowing()
