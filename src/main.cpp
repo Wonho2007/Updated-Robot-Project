@@ -65,8 +65,10 @@ void turnCenter(int percent, int degrees) // Positive degrees turns right. Negat
 
 {
     // Find counts needed for degrees
-    const float countsPerDegrees = 20.42 / (360 * 40.5);
+    const float countsPerDegrees = (20.42 / 360) * 40.5;
     int counts = abs(degrees) * countsPerDegrees;
+    LCD.WriteLine("Turning about center. Counts needed: ");
+    LCD.WriteLine(counts);
 
     // Reset encoder counts
     right_encoder.ResetCounts();
@@ -101,7 +103,7 @@ void turnAboutWheel(int percent, int degrees, char wheelPivot) // using encoders
 
 {
     // Find counts needed for degrees
-    const float countsPerDegrees = 40.841 / (360 * 40.5);
+    const float countsPerDegrees = (20.42 / 360) * 40.5;
     int counts = abs(degrees) * countsPerDegrees;
 
     // Reset encoder counts
@@ -144,48 +146,42 @@ void turnAboutWheel(int percent, int degrees, char wheelPivot) // using encoders
     left_motor.Stop();
 }
 
-
 void ERCMain()
 {
-    const int motor_percent = 25; // Input power level here
+    const int motorSpeed = 25; // Input power level here
+    const int fastMotorSpeed = 100;
 
     int x, y; // for touch screen
 
-    // Initialize the screen
-    LCD.Clear(BLACK);
-    LCD.SetFontColor(WHITE);
+    while (true)
+    {
+        // Initialize the screen
+        LCD.Clear(BLACK);
+        LCD.SetFontColor(WHITE);
 
-    LCD.WriteLine("Touch the screen");
-    while (!LCD.Touch(&x, &y))
-        ; // Wait for screen to be pressed
-    while (LCD.Touch(&x, &y))
-        ; // Wait for screen to be unpressed
+        LCD.Clear(BLACK);
+        LCD.WriteLine("Touch the screen: Forward 34");
+        while (!LCD.Touch(&x, &y))
+            ; // Wait for screen to be pressed
+        while (LCD.Touch(&x, &y))
+            ; // Wait for screen to be unpressed
+        drive(motorSpeed, 34);
 
-    drive(motor_percent, 36);
-    Sleep(2.0); // Wait for counts to stabilize
+        LCD.Clear(BLACK);
+        LCD.WriteLine("Touch the screen: backwards up ramp 35");
+        while (!LCD.Touch(&x, &y))
+            ; // Wait for screen to be pressed
+        while (LCD.Touch(&x, &y))
+            ; // Wait for screen to be unpressed
+        drive(fastMotorSpeed, -15);
+        drive(motorSpeed, -20);
 
-    LCD.WriteLine("Touch the screen");
-    while (!LCD.Touch(&x, &y))
-        ; // Wait for screen to be pressed
-    while (LCD.Touch(&x, &y))
-        ; // Wait for screen to be unpressed
+        Sleep(2.0);
 
-    drive(motor_percent, -36);
-
-    Sleep(2.0);
-
-    turnCenter(motor_percent, 90);
-    Sleep(2.0);
-    turnCenter(motor_percent, -90);
-    Sleep(2.0);
-    turnAboutWheel(motor_percent, 90, 'R');
-    Sleep(2.0);
-    turnAboutWheel(motor_percent, -90, 'R');
-    Sleep(2.0);
-    turnAboutWheel(motor_percent, 90, 'L');
-    Sleep(2.0);
-    turnAboutWheel(motor_percent, -90, 'L');
-    Sleep(2.0);
+        LCD.Clear(BLACK);
+        LCD.WriteLine("Drive down ramp 35");
+        drive(motorSpeed, 35);
+    }
 }
 
 void lineFolowing()
