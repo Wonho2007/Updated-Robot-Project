@@ -5,7 +5,7 @@
 
 // Declarations for encoders & motors
 DigitalEncoder right_encoder(FEHIO::Pin8);
-DigitalEncoder left_encoder(FEHIO::Pin9);
+DigitalEncoder left_encoder(FEHIO::Pin10);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 
@@ -168,19 +168,18 @@ void ERCMain()
         drive(motorSpeed, 34);
 
         LCD.Clear(BLACK);
-        LCD.WriteLine("Touch the screen: backwards up ramp 35");
+        LCD.WriteLine("Touch the screen: backwards up ramp 34");
         while (!LCD.Touch(&x, &y))
             ; // Wait for screen to be pressed
         while (LCD.Touch(&x, &y))
             ; // Wait for screen to be unpressed
-        drive(fastMotorSpeed, -15);
-        drive(motorSpeed, -20);
+        drive(fastMotorSpeed, -32);
 
         Sleep(2.0);
 
         LCD.Clear(BLACK);
-        LCD.WriteLine("Drive down ramp 35");
-        drive(motorSpeed, 35);
+        LCD.WriteLine("Drive down ramp 30");
+        drive(fastMotorSpeed, 30);
     }
 }
 
