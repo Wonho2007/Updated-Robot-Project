@@ -16,8 +16,26 @@ enum
     RIGHT
 };
 
+void driveTime(int percent, int seconds) // using encoders
+{
+    // Set both motors to desired percent
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(percent);
+
+    // While the timer is less than seconds,
+    // keep running motors
+    float timeStart = TimeNow();
+
+    while ((TimeNow() - timeStart) < seconds)
+        ;
+
+    // Turn off motors
+    right_motor.Stop();
+    left_motor.Stop();
+}
+
 // Assumes percent > 0
-void drive(int percent, int inches) // using encoders
+void driveDistance(int percent, int inches) // using encoders
 {
     const float countsPerInch = 40.5;
 
@@ -165,7 +183,7 @@ void ERCMain()
             ; // Wait for screen to be pressed
         while (LCD.Touch(&x, &y))
             ; // Wait for screen to be unpressed
-        drive(motorSpeed, 34);
+        driveDistance(motorSpeed, 34);
 
         LCD.Clear(BLACK);
         LCD.WriteLine("Touch the screen: backwards up ramp 34");
@@ -173,13 +191,13 @@ void ERCMain()
             ; // Wait for screen to be pressed
         while (LCD.Touch(&x, &y))
             ; // Wait for screen to be unpressed
-        drive(fastMotorSpeed, -32);
+        driveDistance(fastMotorSpeed, -32);
 
         Sleep(2.0);
 
         LCD.Clear(BLACK);
         LCD.WriteLine("Drive down ramp 30");
-        drive(fastMotorSpeed, 30);
+        driveDistance(fastMotorSpeed, 30);
     }
 }
 
