@@ -161,6 +161,7 @@ void turnAboutWheel(int percent, int degrees, char wheelPivot) // using encoders
     left_motor.Stop();
 }
 
+
 void ERCMain()
 {
     const int motorSpeed = 25; // Input power level here
@@ -176,12 +177,19 @@ void ERCMain()
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
 
+    while (!LCD.Touch(&x, &y))
+            ; // Wait for screen to be pressed
+    while (LCD.Touch(&x, &y))
+            ; // Wait for screen to be unpressed
+
+    /*
     // Wait for cds cell to read start light
     float cdsValue = cdsCell.Value();
     while (cdsValue > cdsRedHighThresh)
     {
         cdsValue = cdsCell.Value();
     }
+     */
 
     // Drive into button.
     driveTime(motorSpeed, 1);
@@ -196,6 +204,7 @@ void ERCMain()
 
     //---Drive to humidifier light---
 
+    /*
     // Read and display the color.
     cdsValue = cdsCell.Value();
     char lightColor = 'N';
@@ -228,4 +237,6 @@ void ERCMain()
     {
         LCD.Clear(BLACK);
     }
+
+    */
 }
