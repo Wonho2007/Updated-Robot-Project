@@ -12,7 +12,6 @@ DigitalEncoder left_encoder(FEHIO::Pin10);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 
-
 void driveTime(int percent, int seconds) // using encoders
 {
     // Set both motors to desired percent
@@ -161,7 +160,6 @@ void turnAboutWheel(int percent, int degrees, char wheelPivot) // using encoders
     left_motor.Stop();
 }
 
-
 void ERCMain()
 {
     const int motorSpeed = 25; // Input power level here
@@ -173,14 +171,32 @@ void ERCMain()
 
     int x, y; // for touch screen
 
-    // Initialize the screen
-    LCD.Clear(BLACK);
-    LCD.SetFontColor(WHITE);
+    while (true)
+    {
+        // Initialize the screen
+        LCD.Clear(BLACK);
+        LCD.SetFontColor(WHITE);
+        LCD.Write("Tap to go forwards.");
 
-    while (!LCD.Touch(&x, &y))
+        while (!LCD.Touch(&x, &y))
             ; // Wait for screen to be pressed
-    while (LCD.Touch(&x, &y))
+        while (LCD.Touch(&x, &y))
             ; // Wait for screen to be unpressed
+
+        driveDistance(motorSpeed, rampDistance);
+
+        // Initialize the screen
+        LCD.Clear(BLACK);
+        LCD.SetFontColor(WHITE);
+        LCD.Write("Tap to go backwards.");
+
+        while (!LCD.Touch(&x, &y))
+            ; // Wait for screen to be pressed
+        while (LCD.Touch(&x, &y))
+            ; // Wait for screen to be unpressed
+
+        driveDistance(-motorSpeed, rampDistance);
+    }
 
     /*
     // Wait for cds cell to read start light
