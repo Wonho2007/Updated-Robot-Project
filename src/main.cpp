@@ -5,24 +5,80 @@
 #include <FEHRCS.h>
 #include <FEHSD.h>
 
+// RCS Delay time
+#define RCS_WAIT_TIME_IN_SEC 0.35
+
+// Shaft encoding counts for CrayolaBots
+#define COUNTS_PER_INCH 40.5
+#define COUNTS_PER_DEGREE 2.48
+
+// Defines for pulsing the robot
+#define PULSE_TIME 0.15
+#define PULSE_POWER 25
+
+// Define for the motor power
+#define POWER 25
+
+// Orientation of AruCo Code
+#define PLUS 0
+#define MINUS 1
+
 // Declarations for encoders & motors
-AnalogInputPin cdsCell(FEHIO::Pin3);
 DigitalEncoder right_encoder(FEHIO::Pin8);
-DigitalEncoder left_encoder(FEHIO::Pin10);
+DigitalEncoder left_encoder(FEHIO::Pin9);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 
-void driveTime(int percent, int seconds) // using encoders
+/*
+ * Pulse forward a short distance using time
+ */
+void pulse_forward(int percent, float seconds)
 {
     // Set both motors to desired percent
     right_motor.SetPercent(percent);
     left_motor.SetPercent(percent);
 
-    // While the timer is less than seconds,
-    // keep running motors
-    float timeStart = TimeNow();
+    // Wait for the correct number of seconds
+    Sleep(seconds);
 
-    while ((TimeNow() - timeStart) < seconds)
+    // Turn off motors
+    right_motor.Stop();
+    left_motor.Stop();
+}
+
+/*
+ * Pulse counterclockwise a short distance using time
+ */
+void pulse_counterclockwise(int percent, float seconds)
+{
+    // Set both motors to desired percent
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(-percent);
+
+    // Wait for the correct number of seconds
+    Sleep(seconds);
+
+    // Turn off motors
+    right_motor.Stop();
+    left_motor.Stop();
+}
+
+/*
+ * Move forward using shaft encoders where percent is the motor percent and counts is the distance to travel
+ */
+void move_forward(int percent, int counts) // using encoders
+{
+    // Reset encoder counts
+    right_encoder.ResetCounts();
+    left_encoder.ResetCounts();
+
+    // Set both motors to desired percent
+    left_motor.SetPercent(percent);
+    right_motor.SetPercent(percent);
+
+    // While the average of the left and right encoder are less than counts,
+    // keep running motors
+    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
         ;
 
     // Turn off motors
@@ -30,229 +86,206 @@ void driveTime(int percent, int seconds) // using encoders
     left_motor.Stop();
 }
 
-// Assumes percent > 0
-void driveDistance(int percent, int inches) // using encoders
+/*
+ * Turn counterclockwise using shaft encoders where percent is the motor percent and counts is the distance to travel
+ */
+void turn_counterclockwise(int percent, int counts)
 {
-    const float countsPerInch = 40.5;
-
-    if (inches == 0)
-    {
-        // Set both motors to desired percent
-        right_motor.SetPercent(percent);
-        left_motor.SetPercent(percent);
-
-        // while(input)
-
-        right_motor.Stop();
-        left_motor.Stop();
-    }
-    else
-    {
-        int counts = countsPerInch * abs(inches);
-        // Reset encoder counts
-        right_encoder.ResetCounts();
-        left_encoder.ResetCounts();
-
-        // If driving backwards, set negative percent
-        if (inches < 0)
-        {
-            percent = -1 * percent;
-        }
-
-        // Set both motors to desired percent
-        right_motor.SetPercent(percent);
-        left_motor.SetPercent(percent);
-
-        // While the average of the left and right encoder is less than counts,
-        // keep running motors
-        while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
-            ;
-
-        // Turn off motors
-        right_motor.Stop();
-        left_motor.Stop();
-    }
-}
-
-// Assumes percent > 0;
-void turnCenter(int percent, int degrees) // Positive degrees turns right. Negative turns left.
-
-{
-    // Find counts needed for degrees
-    const float countsPerDegrees = (20.42 / 360) * 40.5;
-    int counts = abs(degrees) * countsPerDegrees;
-    LCD.WriteLine("Turning about center. Counts needed: ");
-    LCD.WriteLine(counts);
-
     // Reset encoder counts
     right_encoder.ResetCounts();
     left_encoder.ResetCounts();
-    left_motor.Stop();
-    right_motor.Stop();
 
-    // If degrees is positive, turn to right. If negative, turn left
-    if (degrees > 0)
-    {
-        // Set both motors to desired percent
-        right_motor.SetPercent(-percent);
-        left_motor.SetPercent(percent);
-    }
-    else
-    {
-        // Set both motors to desired percent
-        right_motor.SetPercent(percent);
-        left_motor.SetPercent(-percent);
-    }
+    // Set both motors to desired percent
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(-percent);
 
-    // Wait until the average of the left and right encoder is less than counts
+    // While the average of the left and right encoder are less than counts,
+    // keep running motors
     while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
         ;
 
+    // Turn off motors
     right_motor.Stop();
     left_motor.Stop();
 }
 
-// Assumes percent > 0;
-void turnAboutWheel(int percent, int degrees, char wheelPivot) // using encoders
-
+/*
+ * Use RCS to move to the desired x_coordinate based on the orientation of the AruCo code
+ */
+void check_x(float x_coordinate, int orientation)
 {
-    // Find counts needed for degrees
-    const float countsPerDegrees = (20.42 / 360) * 40.5;
-    int counts = abs(degrees) * countsPerDegrees;
-
-    // Reset encoder counts
-    right_encoder.ResetCounts();
-    left_encoder.ResetCounts();
-    left_motor.Stop();
-    right_motor.Stop();
-
-    // Check which wheel is pivot
-    if (wheelPivot == 'R')
+    // Determine the direction of the motors based on the orientation of the AruCo code
+    int power = PULSE_POWER;
+    if (orientation == MINUS)
     {
-        // If degrees is positive, turn to right. If negative, turn left
-        if (degrees < 0)
+        power = -PULSE_POWER;
+    }
+
+    RCSPose *pose = RCS.RequestPosition();
+
+    // Check if receiving proper RCS coordinates and whether the robot is within an acceptable range
+    for (int i = 0; i < 10; i++)
+    {
+        if (pose->x >= 0 && (pose->x < x_coordinate - 1 || pose->x > x_coordinate + 1))
         {
-            percent = -1 * percent;
-        }
+            if (pose->x > x_coordinate)
+            {
+                // Pulse the motors for a short duration in the correct direction
+                pulse_forward(-power, PULSE_TIME);
+            }
+            else if (pose->x < x_coordinate)
+            {
+                // Pulse the motors for a short duration in the correct direction
+                pulse_forward(power, PULSE_TIME);
+            }
+            Sleep(RCS_WAIT_TIME_IN_SEC);
 
-        left_motor.SetPercent(percent);
+            pose = RCS.RequestPosition();
+        }
     }
-    else if (wheelPivot == 'L')
+}
+
+/*
+ * Use RCS to move to the desired y_coordinate based on the orientation of the QR code
+ */
+void check_y(float y_coordinate, int orientation)
+{
+    // Determine the direction of the motors based on the orientation of the QR code
+    int power = PULSE_POWER;
+    if (orientation == MINUS)
     {
-        // If degrees is positive, turn to right. If negative, turn left
-        if (degrees < 0)
+        power = -PULSE_POWER;
+    }
+
+    RCSPose *pose = RCS.RequestPosition();
+
+    int yTarget = y_coordinate;
+    LCD.WriteLine("Going To: " + yTarget);
+
+    // Check if receiving proper RCS coordinates and whether the robot is within an acceptable range
+    for (int i = 0; i < 10; i++)
+    {
+        while (pose->y >= 0 && (pose->y < y_coordinate - 1 || pose->y > y_coordinate + 1))
         {
-            percent = -1 * percent;
+            int currentY = pose->y;
+            LCD.WriteLine("Current y: " + currentY);
+            if (pose->y > y_coordinate)
+            {
+                // Pulse the motors for a short duration in the correct direction
+                pulse_forward(-power, PULSE_TIME);
+            }
+            else if (pose->y < y_coordinate)
+            {
+                // Pulse the motors for a short duration in the correct direction
+                pulse_forward(power, PULSE_TIME);
+            }
+            Sleep(RCS_WAIT_TIME_IN_SEC);
+
+            pose = RCS.RequestPosition();
         }
-
-        right_motor.SetPercent(percent);
     }
-    else
+}
+
+/*
+ * Use RCS to move to the desired heading
+ */
+void check_heading(float heading)
+{
+    // You will need to fill out this one yourself and take into account
+    // checking for proper RCS data and the edge conditions
+    //(when you want the robot to go to 0 degrees or close to 0 degrees)
+
+    /*
+        SUGGESTED ALGORITHM:
+        1. Check the current orientation of the QR code and the desired orientation of the QR code
+        2. Check if the robot is within the desired threshold for the heading based on the orientation
+        3. Pulse in the correct direction based on the orientation
+    */
+
+    // Determine the direction of the motors based on the orientation of the QR code
+    RCSPose *pose = RCS.RequestPosition();
+
+    // Check if receiving proper RCS heading and whether the robot is within an acceptable range
+    for (int i = 0; i < 10; i++)
     {
-        LCD.Write("Not valid pivot");
+        while (pose->heading >= 0 && (pose->heading < heading - 1 || pose->heading > heading + 1))
+        {
+            if (pose->heading > heading)
+            {
+                pulse_counterclockwise(-PULSE_POWER, PULSE_TIME);
+            }
+            else if (pose->heading < heading)
+            {
+                pulse_counterclockwise(PULSE_POWER, PULSE_TIME);
+            }
+            Sleep(RCS_WAIT_TIME_IN_SEC);
+
+            pose = RCS.RequestPosition();
+        }
     }
-
-    // Wait until the average of the left and right encoder is less than counts
-    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
-        ;
-
-    right_motor.Stop();
-    left_motor.Stop();
 }
 
 void ERCMain()
 {
-    const int motorSpeed = 25; // Input power level here
-    const int fastMotorSpeed = 100;
-    const int rampDistance = 35;
-    const int cdsRedHighThresh = 1;
-    const int cdsBlueLowThresh = 1;
-    const int cdsBlueHighThresh = 3;
+    int touch_x, touch_y;
+    float A_x, A_y, B_x, B_y, C_x, C_y, D_x, D_y;
+    float A_heading, B_heading, C_heading, D_heading;
+    int B_C_counts, C_D_counts, turn_90_counts;
 
-    int x, y; // for touch screen
+    RCS.InitializeTouchMenu("Z1TESTING");
 
-    while (true)
-    {
-        // Initialize the screen
-        LCD.Clear(BLACK);
-        LCD.SetFontColor(WHITE);
-        LCD.Write("Tap to go forwards.");
+    LCD.WriteLine("RCS & Data Logging Test");
+    LCD.WriteLine("Press Screen To Start");
+    while (!LCD.Touch(&touch_x, &touch_y))
+        ;
+    while (LCD.Touch(&touch_x, &touch_y))
+        ;
 
-        while (!LCD.Touch(&x, &y))
-            ; // Wait for screen to be pressed
-        while (LCD.Touch(&x, &y))
-            ; // Wait for screen to be unpressed
+    // COMPLETE CODE HERE TO READ SD CARD FOR LOGGED X AND Y DATA POINTS
+    A_x = 25.6;
+    A_y = 40.19;
+    B_x = 27.77;
+    B_y = 55.54;
+    C_x = 10;
+    C_y = 55.35;
+    D_x = 10.59;
+    D_y = 42.9;
 
-        driveDistance(motorSpeed, rampDistance);
+    // WRITE CODE HERE TO SET THE HEADING DEGREES AND COUNTS VALUES
+    A_heading = 90;
+    B_heading = 180;
+    C_heading = 270;
+    D_heading = 360;
 
-        // Initialize the screen
-        LCD.Clear(BLACK);
-        LCD.SetFontColor(WHITE);
-        LCD.Write("Tap to go backwards.");
+    B_C_counts = 10 * COUNTS_PER_INCH;
+    C_D_counts = 10 * COUNTS_PER_INCH;
 
-        while (!LCD.Touch(&x, &y))
-            ; // Wait for screen to be pressed
-        while (LCD.Touch(&x, &y))
-            ; // Wait for screen to be unpressed
+    turn_90_counts = 90 * COUNTS_PER_DEGREE;
 
-        driveDistance(-motorSpeed, rampDistance);
-    }
+    // A --> B
+    LCD.Clear();
+    LCD.WriteLine("Pulsing");
+    check_y(B_y, PLUS);
+    Sleep(1.0);
+    LCD.Clear();
+    LCD.WriteLine("Turning");
+    check_heading(B_heading);
 
-    /*
-    // Wait for cds cell to read start light
-    float cdsValue = cdsCell.Value();
-    while (cdsValue > cdsRedHighThresh)
-    {
-        cdsValue = cdsCell.Value();
-    }
-     */
+    // B --> C
+    LCD.Clear();
+    LCD.WriteLine("Moving Forward");
+    move_forward(POWER, B_C_counts);
+    LCD.Clear();
+    LCD.WriteLine("Pulsing");
+    check_x(C_x, MINUS);
+    LCD.Clear();
+    LCD.WriteLine("Turning");
+    turn_counterclockwise(POWER, turn_90_counts);
+    check_heading(C_heading);
 
-    // Drive into button.
-    driveTime(motorSpeed, 1);
-    driveTime(-motorSpeed, 1);
-
-    // Turn 45 degrees to face ramp
-    turnCenter(motorSpeed, 45);
-    Sleep(0.1);
-
-    // Fly up ramp 😎
-    driveDistance(fastMotorSpeed, rampDistance);
-
-    //---Drive to humidifier light---
-
-    /*
-    // Read and display the color.
-    cdsValue = cdsCell.Value();
-    char lightColor = 'N';
-    while (cdsValue > cdsBlueHighThresh)
-    {
-        cdsValue = cdsCell.Value();
-    }
-
-    if (cdsValue > cdsBlueLowThresh)
-    {
-        lightColor = 'B';
-        LCD.Clear(BLUE);
-    }
-    else if (cdsValue < cdsRedHighThresh)
-    {
-        lightColor = 'R';
-        LCD.Clear(RED);
-    }
-
-    // Hit humidifier button.
-    if (lightColor == 'B')
-    {
-        //---Insert code---
-    }
-    else if (lightColor == 'R')
-    {
-        //---Insert code---
-    }
-    else // No valid light color stored.
-    {
-        LCD.Clear(BLACK);
-    }
-
-    */
+    // C --> D
+    move_forward(POWER, C_D_counts);
+    check_y(D_y, MINUS);
+    turn_counterclockwise(POWER, turn_90_counts);
+    check_heading(D_heading);
 }
