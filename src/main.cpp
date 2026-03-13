@@ -81,8 +81,7 @@ void turnCenter(int percent, int degrees) // Positive degrees turns right. Negat
     // Find counts needed for degrees
     const float countsPerDegrees = (20.42 / 360) * 40.5;
     int counts = abs(degrees) * countsPerDegrees;
-    LCD.WriteLine("Turning about center. Counts needed: ");
-    LCD.WriteLine(counts);
+    
 
     // Reset encoder counts
     right_encoder.ResetCounts();
@@ -179,9 +178,9 @@ void ERCMain()
     const int motorSpeed = 25;
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 100;
-    const int rampDistance = 42;
-    const float cdsRedHighThresh = 0.5;
-    const float cdsBlueLowThresh = 0.5;
+    const int rampDistance = 35;
+    const float cdsRedHighThresh = 0.6;
+    const float cdsBlueLowThresh = 0.6;
     const float cdsBlueHighThresh = 1.2;
 
     int x, y; // for touch screen
@@ -191,6 +190,7 @@ void ERCMain()
     LCD.SetFontColor(WHITE);
 
     LCD.WriteLine("Tap to start");
+    Sleep(1.0);
     while (!LCD.Touch(&x, &y))
         ;
     while (LCD.Touch(&x, &y))
@@ -223,7 +223,7 @@ void ERCMain()
     // Turn to right of ramp and move forward to align.
     turnCenter(motorSpeed, 45);
     Sleep(0.1);
-    driveDistance(motorSpeed, -7);
+    driveDistance(motorSpeed, -6.5);
     turnCenter(motorSpeed, -45);
     Sleep(0.1);
 
@@ -231,32 +231,24 @@ void ERCMain()
     LCD.Clear();
     LCD.WriteLine("Going up ramp");
     driveDistance(rampMotorSpeed, -rampDistance);
-    //ram into table
-    Sleep(1);
+    // ram into table
     driveTime(-slowMotorSpeed, 5);
 
-    //align with humidifer
-    driveDistance(rampMotorSpeed, 5.75);
-
+    // align with humidifer
+    driveDistance(motorSpeed, 5.75);
 
     //---Drive to humidifier light---
 
-    LCD.Clear();
-    LCD.WriteLine("Tap screen to turn and drive above cds cell.");
-    while (!LCD.Touch(&x, &y))
-        ;
-    while (LCD.Touch(&x, &y))
-        ; // Wait for screen to be pressed
 
     // Turn to humidifier.
     LCD.Clear();
     LCD.WriteLine("Turning");
     turnCenter(motorSpeed, 93);
-    driveDistance(motorSpeed, 10);
+    driveTime(-motorSpeed, 2);
+    driveDistance(motorSpeed, 13);
 
     // Inch towards light
     cdsValue = cdsCell.Value();
-    char lightColor = 'N';
     while (cdsValue > cdsBlueHighThresh)
     {
         pulse(slowMotorSpeed);
@@ -266,23 +258,31 @@ void ERCMain()
         Sleep(0.2);
     }
 
+    pulse(slowMotorSpeed);
     LCD.WriteLine(cdsValue);
 
     // Check which light
     if (cdsValue > cdsRedHighThresh) // Blue
     {
-        lightColor = 'B';
         // LCD.Clear(BLUE);
         LCD.WriteLine("Blue");
-        turnCenter(motorSpeed, -15);
-        driveTime(rampMotorSpeed, 1);
+        turnCenter(motorSpeed, -11);
+        driveTime(35, 3);
     }
     else // Red
     {
-        lightColor = 'R';
         // LCD.Clear(RED);
         LCD.WriteLine("Red");
-        turnCenter(motorSpeed, 15);
-        driveTime(rampMotorSpeed, 1);
+        turnCenter(motorSpeed, 11);
+        driveTime(35, 3);
     }
+
+    // Go down ramp, hit button.
+    driveTime(-motorSpeed, 1.0);
+    turnCenter(motorSpeed, 14);
+    driveTime(-motorSpeed, 10);
+    driveDistance(motorSpeed, 4);
+    turnCenter(motorSpeed, -90);
+    driveTime(motorSpeed, 7);
+    turnAboutWheel(rampMotorSpeed, 90, 'L');
 }
