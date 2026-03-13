@@ -33,7 +33,7 @@ void driveTime(int percent, float seconds) // using encoders
 // Assumes percent > 0
 void driveDistance(int percent, int inches) // using encoders
 {
-    const float countsPerInch = 318 / (3.141592653589793238462 * 2.75);
+    const float countsPerInch = 318 / (PI * 2.75);
 
     if (inches == 0)
     {
