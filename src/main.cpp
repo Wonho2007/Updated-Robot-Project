@@ -234,7 +234,7 @@ void ERCMain()
     // ram into table
     driveTime(-slowMotorSpeed, 5);
 
-    // align with humidifer
+    // drive backwards away from table
     driveDistance(motorSpeed, 5.75);
 
     //---Drive to humidifier light---
@@ -244,6 +244,8 @@ void ERCMain()
     LCD.WriteLine("Turning");
     turnCenter(motorSpeed, 93);
     driveTime(-motorSpeed, 2);
+
+    //Drive to humidifier light
     driveDistance(motorSpeed, 15);
 
     // Inch towards light
@@ -256,6 +258,7 @@ void ERCMain()
         LCD.WriteLine(cdsValue);
         Sleep(0.2);
 
+        //If the cds value is reading blue, inch forward and read again
         if (cdsValue > cdsBlueHighThresh)
         {
             pulse(slowMotorSpeed);
