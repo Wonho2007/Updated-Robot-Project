@@ -196,6 +196,18 @@ void ERCMain()
     while (LCD.Touch(&x, &y))
         ; // Wait for screen to be pressed
 
+
+    driveDistance(25, 20);
+    right_motor.Stop();
+    left_motor.Stop();
+    Sleep(1.0);
+    driveDistance(25,-20);
+    right_motor.Stop();
+    left_motor.Stop();
+
+
+    while(true);
+
     // Wait for cds cell to read start light
     LCD.Clear();
     LCD.WriteLine("Waiting for start.");
