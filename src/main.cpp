@@ -12,6 +12,9 @@ DigitalEncoder left_encoder(FEHIO::Pin10);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 
+const float countsPerInch = (318 / (PI * 3));
+const float countsPerDegrees = (6.875 * PI / 360) * countsPerInch;
+
 void driveTime(int percent, float seconds) // using encoders
 {
     // Set both motors to desired percent
@@ -33,7 +36,6 @@ void driveTime(int percent, float seconds) // using encoders
 // Assumes percent > 0
 void driveDistance(int percent, int inches) // using encoders
 {
-    const float countsPerInch = 318 / (PI * 3);
 
     if (inches == 0)
     {
@@ -79,10 +81,7 @@ void turnCenter(int percent, int degrees) // Positive degrees turns right. Negat
 
 {
     // Find counts needed for degrees
-    const float countsPerInch = (318 / (PI * 3));
-    const float countsPerDegrees = (6.875 * PI / 360) * countsPerInch;
     int counts = abs(degrees) * countsPerDegrees;
-    
 
     // Reset encoder counts
     right_encoder.ResetCounts();
@@ -117,8 +116,6 @@ void turnAboutWheel(int percent, int degrees, char wheelPivot) // using encoders
 
 {
     // Find counts needed for degrees
-    const float countsPerInch = (318 / (PI * 3));
-    const float countsPerDegrees = (6.875 * PI / 360) * countsPerInch;
     int counts = abs(degrees) * countsPerDegrees;
 
     // Reset encoder counts
@@ -178,11 +175,11 @@ void ERCMain()
 {
     const int slowMotorSpeed = 20; // Input power level here
     const int motorSpeed = 25;
-    const int rampMotorSpeed = 50; //Originially 70
+    const int rampMotorSpeed = 50; // Originially 70
     const int fastMotorSpeed = 100;
     const int rampDistance = 35;
-    const float cdsRedHighThresh = 0.6;
-    const float cdsBlueLowThresh = 0.6;
+    const float cdsRedHighThresh = 0.55;
+    const float cdsBlueLowThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
 
     int x, y; // for touch screen
@@ -191,12 +188,6 @@ void ERCMain()
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
 
-    while(true)
-    {
-        LCD.WriteLine(cdsCell.Value());
-        Sleep(0.5);
-        LCD.Clear();
-    }
 
     LCD.WriteLine("Tap to start");
     Sleep(1.0);
@@ -248,13 +239,12 @@ void ERCMain()
 
     //---Drive to humidifier light---
 
-
     // Turn to humidifier.
     LCD.Clear();
     LCD.WriteLine("Turning");
     turnCenter(motorSpeed, 93);
     driveTime(-motorSpeed, 2);
-    driveDistance(motorSpeed, 13);
+    driveDistance(motorSpeed, 15);
 
     // Inch towards light
     cdsValue = cdsCell.Value();
@@ -265,10 +255,17 @@ void ERCMain()
         LCD.Clear();
         LCD.WriteLine(cdsValue);
         Sleep(0.2);
+
+        if (cdsValue > cdsBlueHighThresh)
+        {
+            pulse(slowMotorSpeed);
+            cdsValue = cdsCell.Value();
+            LCD.Clear();
+            LCD.WriteLine(cdsValue);
+            Sleep(0.2);
+        }
     }
 
-    pulse(slowMotorSpeed);
-    LCD.WriteLine(cdsValue);
 
     // Check which light
     if (cdsValue > cdsRedHighThresh) // Blue
