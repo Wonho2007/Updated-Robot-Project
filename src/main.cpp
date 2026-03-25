@@ -177,7 +177,9 @@ void ERCMain()
     const int motorSpeed = 25;
     const int rampMotorSpeed = 70; // Originially 70
     const int fastMotorSpeed = 100;
-    const int rampDistance = 35;
+    const float rampDistance = 35;
+    const float tableToWindowBackDist = 11.5;
+    const float windowForwardDist = 23;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueLowThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
@@ -237,63 +239,18 @@ void ERCMain()
     driveTime(-slowMotorSpeed, 5);
 
     // drive backwards away from table
-    driveDistance(motorSpeed, 5.75);
+    driveDistance(motorSpeed, tableToWindowBackDist);
 
-    //---Drive to humidifier light---
+    //---Drive to window---
 
-    // Turn to humidifier.
+    // Turn to window.
     LCD.Clear();
     LCD.WriteLine("Turning");
     turnCenter(motorSpeed, 93);
     driveTime(-motorSpeed, 2);
 
     //Drive to humidifier light
-    driveDistance(motorSpeed, 15);
+    driveDistance(slowMotorSpeed, windowForwardDist);
+    driveDistance(slowMotorSpeed, -windowForwardDist);
 
-    // Inch towards light
-    cdsValue = cdsCell.Value();
-    while (cdsValue > cdsBlueHighThresh)
-    {
-        pulse(slowMotorSpeed);
-        cdsValue = cdsCell.Value();
-        LCD.Clear();
-        LCD.WriteLine(cdsValue);
-        Sleep(0.2);
-
-        //If the cds value is reading blue, inch forward and read again
-        if (cdsValue > cdsBlueHighThresh)
-        {
-            pulse(slowMotorSpeed);
-            cdsValue = cdsCell.Value();
-            LCD.Clear();
-            LCD.WriteLine(cdsValue);
-            Sleep(0.2);
-        }
-    }
-
-
-    // Check which light
-    if (cdsValue > cdsRedHighThresh) // Blue
-    {
-        // LCD.Clear(BLUE);
-        LCD.WriteLine("Blue");
-        turnCenter(motorSpeed, -11);
-        driveTime(35, 3);
-    }
-    else // Red
-    {
-        // LCD.Clear(RED);
-        LCD.WriteLine("Red");
-        turnCenter(motorSpeed, 11);
-        driveTime(35, 3);
-    }
-
-    // Go down ramp, hit button.
-    driveTime(-motorSpeed, 1.0);
-    turnCenter(motorSpeed, 14);
-    driveTime(-motorSpeed, 10);
-    driveDistance(motorSpeed, 4);
-    turnCenter(motorSpeed, -90);
-    driveTime(motorSpeed, 7);
-    turnAboutWheel(rampMotorSpeed, 90, 'L');
 }
