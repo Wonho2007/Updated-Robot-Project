@@ -175,7 +175,7 @@ void ERCMain()
 {
     const int slowMotorSpeed = 20; // Input power level here
     const int motorSpeed = 25;
-    const int rampMotorSpeed = 50; // Originially 70
+    const int rampMotorSpeed = 70; // Originially 70
     const int fastMotorSpeed = 100;
     const int rampDistance = 35;
     const float cdsRedHighThresh = 0.55;
@@ -197,16 +197,6 @@ void ERCMain()
         ; // Wait for screen to be pressed
 
 
-    driveDistance(25, 20);
-    right_motor.Stop();
-    left_motor.Stop();
-    Sleep(1.0);
-    driveDistance(25,-20);
-    right_motor.Stop();
-    left_motor.Stop();
-
-
-    while(true);
 
     // Wait for cds cell to read start light
     LCD.Clear();
@@ -235,7 +225,7 @@ void ERCMain()
     // Turn to right of ramp and move forward to align.
     turnCenter(motorSpeed, 45);
     Sleep(0.1);
-    driveDistance(motorSpeed, -6.5);
+    driveDistance(motorSpeed, -7.5); //Used to be 6.5
     turnCenter(motorSpeed, -45);
     Sleep(0.1);
 
