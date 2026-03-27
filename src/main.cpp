@@ -2,8 +2,10 @@
 #include <FEHIO.h>
 #include <FEHUtility.h>
 #include <FEHMotor.h>
+#include <FEHServo.h>
 #include <FEHRCS.h>
 #include <FEHSD.h>
+#include <FEHRCS.h>
 
 // Declarations for encoders & motors
 AnalogInputPin cdsCell(FEHIO::Pin12);
@@ -191,14 +193,7 @@ void ERCMain()
     LCD.SetFontColor(WHITE);
 
 
-    LCD.WriteLine("Tap to start");
-    Sleep(1.0);
-    while (!LCD.Touch(&x, &y))
-        ;
-    while (LCD.Touch(&x, &y))
-        ; // Wait for screen to be pressed
-
-
+    RCS.InitializeTouchMenu("0910B8VYV");
 
     // Wait for cds cell to read start light
     LCD.Clear();
@@ -227,7 +222,7 @@ void ERCMain()
     // Turn to right of ramp and move forward to align.
     turnCenter(motorSpeed, 45);
     Sleep(0.1);
-    driveDistance(motorSpeed, -7.5); //Used to be 6.5
+    driveDistance(motorSpeed, -7.5); // Used to be 6.5
     turnCenter(motorSpeed, -45);
     Sleep(0.1);
 
@@ -243,14 +238,32 @@ void ERCMain()
 
     //---Drive to window---
 
-    // Turn to window.
+    // Turn to face window.
     LCD.Clear();
     LCD.WriteLine("Turning");
     turnCenter(motorSpeed, 93);
     driveTime(-motorSpeed, 2);
 
-    //Drive to humidifier light
-    driveDistance(slowMotorSpeed, windowForwardDist);
-    driveDistance(slowMotorSpeed, -windowForwardDist);
+    // Drive to levers
+    /*
+    Code
+    Code
+    */
 
+    // Get correct lever from the RCS
+    int correctLever = RCS.GetLever();
+
+    // Check which lever to flip and perform some action
+    if (correctLever == 0)
+    {
+        // Perform actions to flip left lever
+    }
+    else if (correctLever == 1)
+    {
+        // Perform actions to flip middle lever
+    }
+    else if (correctLever == 2)
+    {
+        // Perform actions to flip right lever
+    }
 }
