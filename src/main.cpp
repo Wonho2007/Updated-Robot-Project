@@ -192,6 +192,16 @@ void ERCMain()
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
 
+    while (true)
+    {
+        if (LCD.Touch(&x, &y))
+        {
+            driveDistance(rampMotorSpeed, rampDistance);
+            Sleep(0.5);
+            driveDistance(rampMotorSpeed, -rampDistance);
+            Sleep(0.5);
+        }
+    }
 
     RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -213,19 +223,14 @@ void ERCMain()
     driveTime(motorSpeed, 0.5);
     driveTime(-motorSpeed, 0.5);
 
-
     //---Drive to apple bucket---
     driveDistance(motorSpeed, 20);
-    
 
     // Turn 45 degrees to face apple bucket
     LCD.Clear();
     LCD.WriteLine("Turning towards apple");
     turnCenter(motorSpeed, -45);
     Sleep(0.1);
-
-
-
 
     // Turn to face window.
     LCD.Clear();
