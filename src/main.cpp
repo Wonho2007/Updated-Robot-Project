@@ -177,7 +177,7 @@ void ERCMain()
 {
     const int slowMotorSpeed = 20; // Input power level here
     const int motorSpeed = 25;
-    const int rampMotorSpeed = 70; // Originially 70
+    const int rampMotorSpeed = 50;
     const int fastMotorSpeed = 100;
     const float rampDistance = 35;
     const float tableToWindowBackDist = 11.5;
@@ -192,16 +192,6 @@ void ERCMain()
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
 
-    while (true)
-    {
-        if (LCD.Touch(&x, &y))
-        {
-            driveDistance(rampMotorSpeed, rampDistance);
-            Sleep(0.5);
-            driveDistance(rampMotorSpeed, -rampDistance);
-            Sleep(0.5);
-        }
-    }
 
     RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -220,25 +210,39 @@ void ERCMain()
     LCD.Clear();
     LCD.WriteLine("Driving");
     Sleep(1);
-    driveTime(motorSpeed, 0.5);
     driveTime(-motorSpeed, 0.5);
+    driveTime(motorSpeed, 0.5);
+
 
     //---Drive to apple bucket---
-    driveDistance(motorSpeed, 20);
+    //Turn slightly to right and move forward.
+    int firstAppleTurn = 20;
+    turnCenter(motorSpeed, firstAppleTurn);
+    driveDistance(motorSpeed, 15);
+    
 
-    // Turn 45 degrees to face apple bucket
+    // Turn to face apple bucket. Move forward to push arm under handle.
     LCD.Clear();
     LCD.WriteLine("Turning towards apple");
-    turnCenter(motorSpeed, -45);
+    turnCenter(motorSpeed, -45-firstAppleTurn);
+    driveDistance(motorSpeed, 8);
     Sleep(0.1);
 
-    // Turn to face window.
-    LCD.Clear();
-    LCD.WriteLine("Turning");
-    turnCenter(motorSpeed, 93);
-    driveTime(-motorSpeed, 2);
 
-    // Drive to levers
+
+    // Drive to ramp, up ramp
+    /*
+    Code
+    Code
+    */
+
+    // Back up from table, drop off bucket
+    /*
+    Code
+    Code
+    */
+
+    // Align with right wall, drive to levers
     /*
     Code
     Code
