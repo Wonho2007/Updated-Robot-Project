@@ -213,30 +213,19 @@ void ERCMain()
     driveTime(motorSpeed, 0.5);
     driveTime(-motorSpeed, 0.5);
 
-    // Turn 45 degrees to face ramp
-    LCD.Clear();
-    LCD.WriteLine("Turning towards ramp");
-    turnCenter(motorSpeed, 45);
-    Sleep(0.1);
 
-    // Turn to right of ramp and move forward to align.
-    turnCenter(motorSpeed, 45);
-    Sleep(0.1);
-    driveDistance(motorSpeed, -7.5); // Used to be 6.5
+    //---Drive to apple bucket---
+    driveDistance(motorSpeed, 20);
+    
+
+    // Turn 45 degrees to face apple bucket
+    LCD.Clear();
+    LCD.WriteLine("Turning towards apple");
     turnCenter(motorSpeed, -45);
     Sleep(0.1);
 
-    // Fly up ramp 😎
-    LCD.Clear();
-    LCD.WriteLine("Going up ramp");
-    driveDistance(rampMotorSpeed, -rampDistance);
-    // ram into table
-    driveTime(-slowMotorSpeed, 5);
 
-    // drive backwards away from table
-    driveDistance(motorSpeed, tableToWindowBackDist);
 
-    //---Drive to window---
 
     // Turn to face window.
     LCD.Clear();
