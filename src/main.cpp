@@ -13,6 +13,7 @@ DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin10);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
+FEHServo arm(FEHServo::Servo7);
 
 const float countsPerInch = (318 / (PI * 3));
 const float countsPerDegrees = (6.875 * PI / 360) * countsPerInch;
@@ -173,6 +174,7 @@ void pulse(int percent)
     left_motor.Stop();
 }
 
+
 void ERCMain()
 {
     const int slowMotorSpeed = 20; // Input power level here
@@ -185,6 +187,9 @@ void ERCMain()
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueLowThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
+    const float appleUpDegrees = 95;
+    const float parallelDegrees = 142;
+
 
     int x, y; // for touch screen
 
@@ -192,6 +197,33 @@ void ERCMain()
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
 
+
+    arm.SetMin(500);
+    arm.SetMax(2341);
+    arm.SetDegree(parallelDegrees);
+
+    while (true)
+    {
+        LCD.Clear();
+        LCD.Write("Touch to go up");
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+
+        LCD.WriteLine("Going up");
+        arm.SetDegree(appleUpDegrees);
+        Sleep(2.0);
+
+        LCD.Clear();
+        LCD.Write("Touch to go down");
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+
+        LCD.WriteLine("Going down");
+        arm.SetDegree(parallelDegrees);
+        Sleep(2.0);
+    }
 
     RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -213,22 +245,17 @@ void ERCMain()
     driveTime(-motorSpeed, 0.5);
     driveTime(motorSpeed, 0.5);
 
-
     //---Drive to apple bucket---
-    //Turn slightly to right and move forward.
-    int firstAppleTurn = 20;
-    turnCenter(motorSpeed, firstAppleTurn);
-    driveDistance(motorSpeed, 15);
-    
+    // Turn slightly to right and move forward.
+    turnCenter(motorSpeed, 19);
+    driveDistance(motorSpeed, 16);
 
     // Turn to face apple bucket. Move forward to push arm under handle.
     LCD.Clear();
     LCD.WriteLine("Turning towards apple");
-    turnCenter(motorSpeed, -45-firstAppleTurn);
-    driveDistance(motorSpeed, 8);
+    turnCenter(motorSpeed, -61);
+    driveDistance(motorSpeed, 3);
     Sleep(0.1);
-
-
 
     // Drive to ramp, up ramp
     /*
