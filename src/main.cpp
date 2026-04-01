@@ -200,30 +200,7 @@ void ERCMain()
 
     arm.SetMin(500);
     arm.SetMax(2341);
-    arm.SetDegree(parallelDegrees);
-
-    while (true)
-    {
-        LCD.Clear();
-        LCD.Write("Touch to go up");
-        while (!LCD.Touch(&x, &y))
-        {
-        }
-
-        LCD.WriteLine("Going up");
-        arm.SetDegree(appleUpDegrees);
-        Sleep(2.0);
-
-        LCD.Clear();
-        LCD.Write("Touch to go down");
-        while (!LCD.Touch(&x, &y))
-        {
-        }
-
-        LCD.WriteLine("Going down");
-        arm.SetDegree(parallelDegrees);
-        Sleep(2.0);
-    }
+    arm.SetDegree(appleUpDegrees);
 
     RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -254,8 +231,20 @@ void ERCMain()
     LCD.Clear();
     LCD.WriteLine("Turning towards apple");
     turnCenter(motorSpeed, -61);
-    driveDistance(motorSpeed, 3);
+
+    //Move back, lower arm, move forward
+    driveDistance(motorSpeed, -2);
     Sleep(0.1);
+    arm.SetDegree(parallelDegrees);
+    Sleep(1.0);
+    driveDistance(motorSpeed, 5);
+
+    LCD.WriteLine("raise arm");
+    while(!LCD.Touch(&x, &y)){}
+    while(LCD.Touch(&x, &y)){}
+
+    LCD.WriteLine("raising");
+    arm.SetDegree(appleUpDegrees);
 
     // Drive to ramp, up ramp
     /*
