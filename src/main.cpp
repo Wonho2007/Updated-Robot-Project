@@ -212,7 +212,7 @@ void ERCMain()
     const int motorSpeed = 25;
     const int rampMotorSpeed = 50;
     const int fastMotorSpeed = 100;
-    const float rampDistance = 33;
+    const float rampDistance = 27;
     const float tableToWindowBackDist = 11.5;
     const float windowForwardDist = 23;
     const float cdsRedHighThresh = 0.55;
@@ -248,6 +248,8 @@ void ERCMain()
     }
     */
 
+
+
     // Drive into button.
     LCD.Clear();
     LCD.WriteLine("Driving");
@@ -263,7 +265,7 @@ void ERCMain()
     // Turn to face apple bucket. Move forward to push arm under handle.
     LCD.Clear();
     LCD.WriteLine("Turning towards apple");
-    turnCenter(motorSpeed, -61);
+    turnCenter(motorSpeed, -62); //OG 61
 
     // Move back, lower arm, move forward
     driveDistance(motorSpeed, -2);
@@ -271,26 +273,24 @@ void ERCMain()
     arm.SetDegree(parallelDegrees);
     Sleep(1.0);
     driveDistance(motorSpeed, 5);
+    driveTime(motorSpeed, 0.1);
 
+    Sleep(0.2);
     LCD.WriteLine("raise arm");
-    while (!LCD.Touch(&x, &y))
-    {
-    }
-    while (LCD.Touch(&x, &y))
-    {
-    }
-
+    
     LCD.WriteLine("raising");
     arm.SetDegree(appleUpDegrees);
+  
 
     // Drive to ramp, up ramp
     turnCenter(motorSpeed, 25);
-    driveTime(-motorSpeed, 2.5);
+    driveTime(-motorSpeed, 4);
 
-    driveTime(motorSpeed, 0.4);
-    turnCenter(motorSpeed, 93);
+    driveTime(motorSpeed, 0.45);
+    turnCenter(motorSpeed, 95);
     driveDistance(rampMotorSpeed, rampDistance);
-    driveTime(motorSpeed, 3);
+    turnCenter(motorSpeed, 30);
+    driveTime(motorSpeed, 2);
 
     // Back up from table, drop off bucket
     arm.SetDegree(appleUpDegrees+40);
@@ -306,21 +306,20 @@ void ERCMain()
     driveDistance(motorSpeed, -5.75);
 
     turnCenter(motorSpeed, -90);
-    driveDistance(motorSpeed, 10);
-    turnCenter(motorSpeed, 45);
+    driveDistance(motorSpeed, 9);
+    turnCenter(motorSpeed, 48);
     driveDistance(motorSpeed, 9);
 
     //Lower arm
-    arm.SetDegree(parallelDegrees-50);
-    arm.SetDegree(parallelDegrees);
-    Sleep(0.5);
+    arm.SetDegree(180);
+    Sleep(2.0);
 
-    driveDistance(motorSpeed, -2);
+    driveDistance(motorSpeed, -4);
 
     arm.SetDegree(180);
     Sleep(1.0);
-    driveDistance(motorSpeed, 2);
-    arm.SetDegree(upDegrees+40);
+    driveDistance(motorSpeed, 4);
+    arm.SetDegree(upDegrees+10);
     Sleep(0.5);
     driveDistance(motorSpeed, -3);
 
