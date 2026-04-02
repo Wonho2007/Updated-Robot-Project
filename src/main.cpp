@@ -187,8 +187,9 @@ void ERCMain()
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueLowThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
+    const float upDegrees = 50;
     const float appleUpDegrees = 95;
-    const float parallelDegrees = 142;
+    const float parallelDegrees = 160;
 
 
     int x, y; // for touch screen
@@ -197,10 +198,9 @@ void ERCMain()
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
 
-
-    arm.SetMin(500);
-    arm.SetMax(2341);
-    arm.SetDegree(appleUpDegrees);
+    arm.SetMin(830);
+    arm.SetMax(2500);
+    arm.SetDegree(upDegrees);
 
     RCS.InitializeTouchMenu("0910B8VYV");
 
