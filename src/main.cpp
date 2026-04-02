@@ -212,7 +212,7 @@ void ERCMain()
     const int motorSpeed = 25;
     const int rampMotorSpeed = 50;
     const int fastMotorSpeed = 100;
-    const float rampDistance = 30;
+    const float rampDistance = 33;
     const float tableToWindowBackDist = 11.5;
     const float windowForwardDist = 23;
     const float cdsRedHighThresh = 0.55;
@@ -220,7 +220,7 @@ void ERCMain()
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 50;
     const float appleUpDegrees = 95;
-    const float parallelDegrees = 162;
+    const float parallelDegrees = 160;
 
     int x, y; // for touch screen
 
@@ -233,9 +233,10 @@ void ERCMain()
     arm.SetDegree(upDegrees);
     Sleep(1.0);
 
-    RCS.InitializeTouchMenu("0910B8VYV");
+    //RCS.InitializeTouchMenu("0910B8VYV");
 
     // Wait for cds cell to read start light
+    /*
     LCD.Clear();
     LCD.WriteLine("Waiting for start.");
     float cdsValue = cdsCell.Value();
@@ -245,6 +246,7 @@ void ERCMain()
         LCD.Clear();
         LCD.WriteLine(cdsValue);
     }
+    */
 
     // Drive into button.
     LCD.Clear();
@@ -283,37 +285,47 @@ void ERCMain()
 
     // Drive to ramp, up ramp
     turnCenter(motorSpeed, 25);
-    driveTime(-motorSpeed, 5);
+    driveTime(-motorSpeed, 2.5);
 
-    driveDistance(motorSpeed, 2.0);
-    turnCenter(motorSpeed, 90);
+    driveTime(motorSpeed, 0.4);
+    turnCenter(motorSpeed, 93);
     driveDistance(rampMotorSpeed, rampDistance);
+    driveTime(motorSpeed, 3);
 
     // Back up from table, drop off bucket
-    arm.SetDegree(appleUpDegrees+15);
-    driveDistance(motorSpeed, -2);
+    arm.SetDegree(appleUpDegrees+40);
+    Sleep(1.0);
+    driveDistance(motorSpeed, -5);
 
     //Drive into table
     Sleep(1.0);
     arm.SetDegree(upDegrees);
-    driveTime(motorSpeed, 2);
+    driveTime(motorSpeed, 1);
 
     //Back up from table, drive to levers
-    driveDistance(motorSpeed, 5.75);
+    driveDistance(motorSpeed, -5.75);
 
     turnCenter(motorSpeed, -90);
-    driveDistance(motorSpeed, 12);
+    driveDistance(motorSpeed, 10);
     turnCenter(motorSpeed, 45);
-    driveDistance(motorSpeed, 12);
+    driveDistance(motorSpeed, 9);
 
-    // Align with right wall, drive to levers
-    /*
-    Code
-    Code
-    */
+    //Lower arm
+    arm.SetDegree(parallelDegrees-50);
+    arm.SetDegree(parallelDegrees);
+    Sleep(0.5);
+
+    driveDistance(motorSpeed, -2);
+
+    arm.SetDegree(180);
+    Sleep(1.0);
+    driveDistance(motorSpeed, 2);
+    arm.SetDegree(upDegrees+40);
+    Sleep(0.5);
+    driveDistance(motorSpeed, -3);
 
     // Get correct lever from the RCS
-    int correctLever = RCS.GetLever();
+    int correctLever; //= RCS.GetLever();
 
     // Check which lever to flip and perform some action
     if (correctLever == 0)
