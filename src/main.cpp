@@ -174,6 +174,37 @@ void pulse(int percent)
     left_motor.Stop();
 }
 
+void slowArmSetDegrees(float curentDegrees, float targetDegrees)
+{
+    if (targetDegrees < curentDegrees) // Raising arm
+    {
+        for (int i = curentDegrees; i < targetDegrees; i += 5)
+        {
+            arm.SetDegree(i - curentDegrees);
+            Sleep(0.1);
+
+            if(targetDegrees - i < 5)
+            {
+                i = targetDegrees;
+                arm.SetDegree(i - curentDegrees);
+            }
+        }
+    }
+    else //Lowering arm
+    {
+        for (int i = curentDegrees; i < targetDegrees; i += 5)
+        {
+            arm.SetDegree(i + curentDegrees);
+            Sleep(0.1);
+
+            if(targetDegrees - i < 5)
+            {
+                i = targetDegrees;
+                arm.SetDegree(i + curentDegrees);
+            }
+        }
+    }
+}
 
 void ERCMain()
 {
@@ -181,7 +212,7 @@ void ERCMain()
     const int motorSpeed = 25;
     const int rampMotorSpeed = 50;
     const int fastMotorSpeed = 100;
-    const float rampDistance = 35;
+    const float rampDistance = 30;
     const float tableToWindowBackDist = 11.5;
     const float windowForwardDist = 23;
     const float cdsRedHighThresh = 0.55;
@@ -189,8 +220,7 @@ void ERCMain()
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 50;
     const float appleUpDegrees = 95;
-    const float parallelDegrees = 160;
-
+    const float parallelDegrees = 162;
 
     int x, y; // for touch screen
 
@@ -201,6 +231,7 @@ void ERCMain()
     arm.SetMin(830);
     arm.SetMax(2500);
     arm.SetDegree(upDegrees);
+    Sleep(1.0);
 
     RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -232,7 +263,7 @@ void ERCMain()
     LCD.WriteLine("Turning towards apple");
     turnCenter(motorSpeed, -61);
 
-    //Move back, lower arm, move forward
+    // Move back, lower arm, move forward
     driveDistance(motorSpeed, -2);
     Sleep(0.1);
     arm.SetDegree(parallelDegrees);
@@ -240,23 +271,40 @@ void ERCMain()
     driveDistance(motorSpeed, 5);
 
     LCD.WriteLine("raise arm");
-    while(!LCD.Touch(&x, &y)){}
-    while(LCD.Touch(&x, &y)){}
+    while (!LCD.Touch(&x, &y))
+    {
+    }
+    while (LCD.Touch(&x, &y))
+    {
+    }
 
     LCD.WriteLine("raising");
     arm.SetDegree(appleUpDegrees);
 
     // Drive to ramp, up ramp
-    /*
-    Code
-    Code
-    */
+    turnCenter(motorSpeed, 25);
+    driveTime(-motorSpeed, 5);
+
+    driveDistance(motorSpeed, 2.0);
+    turnCenter(motorSpeed, 90);
+    driveDistance(rampMotorSpeed, rampDistance);
 
     // Back up from table, drop off bucket
-    /*
-    Code
-    Code
-    */
+    arm.SetDegree(appleUpDegrees+15);
+    driveDistance(motorSpeed, -2);
+
+    //Drive into table
+    Sleep(1.0);
+    arm.SetDegree(upDegrees);
+    driveTime(motorSpeed, 2);
+
+    //Back up from table, drive to levers
+    driveDistance(motorSpeed, 5.75);
+
+    turnCenter(motorSpeed, -90);
+    driveDistance(motorSpeed, 12);
+    turnCenter(motorSpeed, 45);
+    driveDistance(motorSpeed, 12);
 
     // Align with right wall, drive to levers
     /*
