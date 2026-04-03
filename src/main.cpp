@@ -290,7 +290,15 @@ void ERCMain()
     turnCenter(motorSpeed, 80);
 
     driveDistance(rampMotorSpeed, rampDistance);
-    turnCenter(motorSpeed, 30);
+
+    turnCenter(motorSpeed, -110);
+
+    driveTime(-motorSpeed, 2);
+
+    driveDistance(motorSpeed, 2);
+
+    turnCenter(motorSpeed, 110);
+
     driveTime(motorSpeed, 2);
 
     // Back up from table, drop off bucket
@@ -310,7 +318,7 @@ void ERCMain()
     driveTime(-motorSpeed, 1);
     driveDistance(motorSpeed, 8);
     turnCenter(motorSpeed, 48);
-    driveDistance(motorSpeed, 11);
+    driveDistance(motorSpeed, 12);
 
     //Lower arm
     arm.SetDegree(180);
@@ -320,7 +328,7 @@ void ERCMain()
 
     arm.SetDegree(180);
     Sleep(1.0);
-    driveDistance(motorSpeed, 4);
+    driveDistance(motorSpeed, 5);
     arm.SetDegree(upDegrees+10);
     Sleep(0.5);
     driveDistance(motorSpeed, -3);
