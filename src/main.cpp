@@ -270,7 +270,7 @@ void ERCMain()
     // Move back, lower arm, move forward
     driveDistance(motorSpeed, -2);
     Sleep(0.1);
-    arm.SetDegree(parallelDegrees);
+    arm.SetDegree(parallelDegrees+3); //a*********************************
     Sleep(1.0);
     driveDistance(motorSpeed, 5);
     driveTime(motorSpeed, 0.1);
@@ -285,6 +285,10 @@ void ERCMain()
     // Slightly turn and back up from tree
     turnCenter(motorSpeed, 25);
     driveDistance(motorSpeed, -17);
+
+
+    //FOR NO BUCKET ************************************
+    arm.SetDegree(upDegrees);
 
     //Finish turn to ramp
     turnCenter(motorSpeed, 80);
@@ -301,8 +305,8 @@ void ERCMain()
 
     driveTime(motorSpeed, 2);
 
-    // Back up from table, drop off bucket
-    arm.SetDegree(appleUpDegrees+40);
+    // Back up from table, drop off bucket ******************************
+    //arm.SetDegree(appleUpDegrees+40);
     Sleep(1.0);
     driveDistance(motorSpeed, -5);
 
