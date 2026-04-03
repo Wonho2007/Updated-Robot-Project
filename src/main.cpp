@@ -235,8 +235,8 @@ void ERCMain()
 
     //RCS.InitializeTouchMenu("0910B8VYV");
 
-    // Wait for cds cell to read start light
-    /*
+    //Wait for cds cell to read start light
+    
     LCD.Clear();
     LCD.WriteLine("Waiting for start.");
     float cdsValue = cdsCell.Value();
@@ -246,7 +246,7 @@ void ERCMain()
         LCD.Clear();
         LCD.WriteLine(cdsValue);
     }
-    */
+    
 
 
 
@@ -282,12 +282,13 @@ void ERCMain()
     arm.SetDegree(appleUpDegrees);
   
 
-    // Drive to ramp, up ramp
+    // Slightly turn and back up from tree
     turnCenter(motorSpeed, 25);
-    driveTime(-motorSpeed, 4);
+    driveDistance(motorSpeed, -17);
 
-    driveTime(motorSpeed, 0.45);
-    turnCenter(motorSpeed, 95);
+    //Finish turn to ramp
+    turnCenter(motorSpeed, 80);
+
     driveDistance(rampMotorSpeed, rampDistance);
     turnCenter(motorSpeed, 30);
     driveTime(motorSpeed, 2);
@@ -306,13 +307,14 @@ void ERCMain()
     driveDistance(motorSpeed, -5.75);
 
     turnCenter(motorSpeed, -90);
-    driveDistance(motorSpeed, 9);
+    driveTime(-motorSpeed, 1);
+    driveDistance(motorSpeed, 8);
     turnCenter(motorSpeed, 48);
-    driveDistance(motorSpeed, 9);
+    driveDistance(motorSpeed, 11);
 
     //Lower arm
     arm.SetDegree(180);
-    Sleep(2.0);
+    Sleep(7.0);
 
     driveDistance(motorSpeed, -4);
 
