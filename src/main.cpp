@@ -16,7 +16,7 @@ FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 FEHServo arm(FEHServo::Servo7);
 
 const float countsPerInch = (318 / (PI * 3));
-const float countsPerDegrees = (6.875 * PI / 360) * countsPerInch;
+const float countsPerDegrees = (6.9 * PI / 360) * countsPerInch; //6.875 og
 
 void driveTime(int percent, float seconds) // using encoders
 {
@@ -269,6 +269,8 @@ void ERCMain()
     }
     */
 
+
+
     // Drive into button.
     LCD.Clear();
     LCD.WriteLine("Driving");
@@ -295,20 +297,86 @@ void ERCMain()
 
     // Go back to hit button.
 
+
+    //Turn to apple stump and go forward slightly
     Sleep(1.0);
     turnCenter(motorSpeed, 45 + 90);
     driveDistance(motorSpeed, 2);
+
+    //Turn to left wall to align
     turnCenter(motorSpeed, -90);
     driveTime(motorSpeed, 2);
 
+    //Drive to back wall
     driveDistance(motorSpeed, -24);
     driveTime(-motorSpeed, 2);
 
+    //Drive to apple bucket
     driveDistance(motorSpeed, 15);
     turnCenter(motorSpeed, 90);
     driveDistance(motorSpeed, 9);
     turnCenter(motorSpeed, -90);
+
+    //Pick up bucket
     arm.SetDegree(parallelDegrees);
-    Sleep(0.5);
+    Sleep(0.1);
     driveDistance(motorSpeed, 3);
+
+    Sleep(0.2);
+    LCD.WriteLine("raise arm");
+    
+    LCD.WriteLine("raising");
+    arm.SetDegree(appleUpDegrees);
+  
+
+    // Slightly turn and back up from tree
+    turnCenter(motorSpeed, 25);
+    driveDistance(motorSpeed, -17);
+
+    //Finish turn to ramp
+    turnCenter(motorSpeed, 65); //OG 75
+
+    driveDistance(rampMotorSpeed, rampDistance);
+
+    turnCenter(motorSpeed, -100);
+
+    driveTime(-motorSpeed, 2);
+
+    driveDistance(motorSpeed, 2);
+
+    turnCenter(motorSpeed, 100);
+
+    driveTime(motorSpeed, 2);
+
+    // Back up from table, drop off bucket
+    arm.SetDegree(appleUpDegrees+40);
+    Sleep(1.0);
+    driveDistance(motorSpeed, -5);
+
+    //Drive into table
+    Sleep(1.0);
+    arm.SetDegree(upDegrees);
+    driveTime(motorSpeed, 1);
+
+    //Back up from table, drive to levers
+    driveDistance(motorSpeed, -5.75);
+
+    turnCenter(motorSpeed, -90);
+    driveTime(-motorSpeed, 1);
+    driveDistance(motorSpeed, 8);
+    turnCenter(motorSpeed, 52); //OG48
+    driveDistance(motorSpeed, 13);
+
+    //Lower arm
+    arm.SetDegree(180);
+    Sleep(7.0);
+
+    driveDistance(motorSpeed, -4);
+
+    arm.SetDegree(180);
+    Sleep(1.0);
+    driveDistance(motorSpeed, 5);
+    arm.SetDegree(upDegrees+10);
+    Sleep(0.5);
+    driveDistance(motorSpeed, -3);
 }
