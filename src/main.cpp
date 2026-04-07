@@ -115,6 +115,26 @@ void turnCenter(int percent, int degrees) // Positive degrees turns right. Negat
 }
 
 // Assumes percent > 0;
+void turnCenterTime(int percent, float seconds) // Positive degrees turns right. Negative turns left.
+
+{
+    // Reset encoder counts
+    right_encoder.ResetCounts();
+    left_encoder.ResetCounts();
+    left_motor.Stop();
+    right_motor.Stop();
+
+    // If degrees is positive, turn to right. If negative, turn left
+    right_motor.SetPercent(-percent);
+    left_motor.SetPercent(percent);
+
+    Sleep(seconds);
+
+    right_motor.Stop();
+    left_motor.Stop();
+}
+
+// Assumes percent > 0;
 void turnAboutWheel(int percent, int degrees, char wheelPivot) // using encoders
 
 {
@@ -183,21 +203,21 @@ void slowArmSetDegrees(float curentDegrees, float targetDegrees)
             arm.SetDegree(i - curentDegrees);
             Sleep(0.1);
 
-            if(targetDegrees - i < 5)
+            if (targetDegrees - i < 5)
             {
                 i = targetDegrees;
                 arm.SetDegree(i - curentDegrees);
             }
         }
     }
-    else //Lowering arm
+    else // Lowering arm
     {
         for (int i = curentDegrees; i < targetDegrees; i += 5)
         {
             arm.SetDegree(i + curentDegrees);
             Sleep(0.1);
 
-            if(targetDegrees - i < 5)
+            if (targetDegrees - i < 5)
             {
                 i = targetDegrees;
                 arm.SetDegree(i + curentDegrees);
@@ -233,10 +253,11 @@ void ERCMain()
     arm.SetDegree(upDegrees);
     Sleep(1.0);
 
-    //RCS.InitializeTouchMenu("0910B8VYV");
+    // RCS.InitializeTouchMenu("0910B8VYV");
 
-    //Wait for cds cell to read start light
-    
+    // Wait for cds cell to read start light
+
+    /*
     LCD.Clear();
     LCD.WriteLine("Waiting for start.");
     float cdsValue = cdsCell.Value();
@@ -246,9 +267,7 @@ void ERCMain()
         LCD.Clear();
         LCD.WriteLine(cdsValue);
     }
-    
-
-
+    */
 
     // Drive into button.
     LCD.Clear();
@@ -257,96 +276,39 @@ void ERCMain()
     driveTime(-motorSpeed, 0.5);
     driveTime(motorSpeed, 0.5);
 
-    //---Drive to apple bucket---
-    // Turn slightly to right and move forward.
-    turnCenter(motorSpeed, 19);
-    driveDistance(motorSpeed, 16);
+    //---Drive to compost bin---
+    // Drive forward
+    driveDistance(motorSpeed, 6);
 
-    // Turn to face apple bucket. Move forward to push arm under handle.
-    LCD.Clear();
-    LCD.WriteLine("Turning towards apple");
-    turnCenter(motorSpeed, -62); //OG 61
+    // Turn to face compost bin, drive forward
+    turnCenter(motorSpeed, -50);
+    driveDistance(motorSpeed, 12);
 
-    // Move back, lower arm, move forward
-    driveDistance(motorSpeed, -2);
-    Sleep(0.1);
-    arm.SetDegree(parallelDegrees);
+    // Turn on motor
+
+    // Turn wheel into compost bin
+    turnCenterTime(-motorSpeed, 0.5);
+
+    // Wait 2 seconds, reverse motor
+
+    // Wait 2 seconds, turn off motor
+
+    // Go back to hit button.
+
     Sleep(1.0);
-    driveDistance(motorSpeed, 5);
-    driveTime(motorSpeed, 0.1);
-
-    Sleep(0.2);
-    LCD.WriteLine("raise arm");
-    
-    LCD.WriteLine("raising");
-    arm.SetDegree(appleUpDegrees);
-  
-
-    // Slightly turn and back up from tree
-    turnCenter(motorSpeed, 25);
-    driveDistance(motorSpeed, -17);
-
-    //Finish turn to ramp
-    turnCenter(motorSpeed, 65); //OG 75
-
-    driveDistance(rampMotorSpeed, rampDistance);
-
-    turnCenter(motorSpeed, -100);
-
-    driveTime(-motorSpeed, 2);
-
+    turnCenter(motorSpeed, 45 + 90);
     driveDistance(motorSpeed, 2);
-
-    turnCenter(motorSpeed, 100);
-
+    turnCenter(motorSpeed, -90);
     driveTime(motorSpeed, 2);
 
-    // Back up from table, drop off bucket
-    arm.SetDegree(appleUpDegrees+40);
-    Sleep(1.0);
-    driveDistance(motorSpeed, -5);
+    driveDistance(motorSpeed, -24);
+    driveTime(-motorSpeed, 2);
 
-    //Drive into table
-    Sleep(1.0);
-    arm.SetDegree(upDegrees);
-    driveTime(motorSpeed, 1);
-
-    //Back up from table, drive to levers
-    driveDistance(motorSpeed, -5.75);
-
+    driveDistance(motorSpeed, 15);
+    turnCenter(motorSpeed, 90);
+    driveDistance(motorSpeed, 9);
     turnCenter(motorSpeed, -90);
-    driveTime(-motorSpeed, 1);
-    driveDistance(motorSpeed, 7);
-    turnCenter(motorSpeed, 52); //OG48
-    driveDistance(motorSpeed, 13);
-
-    //Lower arm
-    arm.SetDegree(180);
-    Sleep(7.0);
-
-    driveDistance(motorSpeed, -4);
-
-    arm.SetDegree(180);
-    Sleep(1.0);
-    driveDistance(motorSpeed, 5);
-    arm.SetDegree(upDegrees+10);
+    arm.SetDegree(parallelDegrees);
     Sleep(0.5);
-    driveDistance(motorSpeed, -3);
-
-    // Get correct lever from the RCS
-    int correctLever; //= RCS.GetLever();
-
-    // Check which lever to flip and perform some action
-    if (correctLever == 0)
-    {
-        // Perform actions to flip left lever
-    }
-    else if (correctLever == 1)
-    {
-        // Perform actions to flip middle lever
-    }
-    else if (correctLever == 2)
-    {
-        // Perform actions to flip right lever
-    }
+    driveDistance(motorSpeed, 3);
 }
