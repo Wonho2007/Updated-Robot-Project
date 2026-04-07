@@ -37,7 +37,7 @@ void driveTime(int percent, float seconds) // using encoders
 }
 
 // Assumes percent > 0
-void driveDistance(int percent, int inches) // using encoders
+void driveDistance(int percent, float inches) // using encoders
 {
 
     if (inches == 0)
@@ -53,7 +53,7 @@ void driveDistance(int percent, int inches) // using encoders
     }
     else
     {
-        int counts = countsPerInch * abs(inches);
+        float counts = countsPerInch * abs(inches);
         // Reset encoder counts
         right_encoder.ResetCounts();
         left_encoder.ResetCounts();
@@ -231,9 +231,11 @@ void ERCMain()
     const int slowMotorSpeed = 20; // Input power level here
     const int motorSpeed = 25;
     const int rampMotorSpeed = 50;
-    const int fastMotorSpeed = 100;
+    const int fastMotorSpeed = 60;
     const float rampDistance = 27;
     const float tableToWindowBackDist = 11.5;
+    const float tableToLeverBack = 5;
+    const float tableToHumidifierBack = 1.3;
     const float windowForwardDist = 23;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueLowThresh = 0.55;
@@ -250,8 +252,10 @@ void ERCMain()
 
     arm.SetMin(830);
     arm.SetMax(2500);
-    arm.SetDegree(upDegrees);
+    arm.SetDegree(0);
     Sleep(1.0);
+    float cdsValue = cdsCell.Value();
+
 
     // RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -260,7 +264,7 @@ void ERCMain()
     /*
     LCD.Clear();
     LCD.WriteLine("Waiting for start.");
-    float cdsValue = cdsCell.Value();
+    cdsValue = cdsCell.Value();
     while (cdsValue > cdsRedHighThresh)
     {
         cdsValue = cdsCell.Value();
@@ -308,19 +312,20 @@ void ERCMain()
     driveTime(motorSpeed, 2);
 
     //Drive to back wall
-    driveDistance(motorSpeed, -24);
+    driveDistance(motorSpeed, -10); //og -24
+    driveDistance(fastMotorSpeed, -14);
     driveTime(-motorSpeed, 2);
 
     //Drive to apple bucket
     driveDistance(motorSpeed, 15);
-    turnCenter(motorSpeed, 90);
-    driveDistance(motorSpeed, 9);
-    turnCenter(motorSpeed, -90);
+    turnCenter(motorSpeed, 95);
+    driveDistance(motorSpeed, 8);
+    turnCenter(motorSpeed, -92);
 
     //Pick up bucket
     arm.SetDegree(parallelDegrees);
-    Sleep(0.1);
-    driveDistance(motorSpeed, 3);
+    Sleep(0.2);
+    driveDistance(motorSpeed, 2.5);
 
     Sleep(0.2);
     LCD.WriteLine("raise arm");
@@ -359,24 +364,52 @@ void ERCMain()
     driveTime(motorSpeed, 1);
 
     //Back up from table, drive to levers
-    driveDistance(motorSpeed, -5.75);
+    driveDistance(motorSpeed, -tableToHumidifierBack);
 
-    turnCenter(motorSpeed, -90);
-    driveTime(-motorSpeed, 1);
-    driveDistance(motorSpeed, 8);
-    turnCenter(motorSpeed, 52); //OG48
-    driveDistance(motorSpeed, 13);
+    // Turn to humidifier.
+    LCD.Clear();
+    LCD.WriteLine("Turning");
+    turnCenter(motorSpeed, -93);
+    driveTime(-motorSpeed, 2);
 
-    //Lower arm
-    arm.SetDegree(180);
-    Sleep(7.0);
+    //Drive to humidifier light
+    driveDistance(motorSpeed, 15);
 
-    driveDistance(motorSpeed, -4);
+    // Inch towards light
+    cdsValue = cdsCell.Value();
+    while (cdsValue > cdsBlueHighThresh)
+    {
+        pulse(slowMotorSpeed);
+        cdsValue = cdsCell.Value();
+        LCD.Clear();
+        LCD.WriteLine(cdsValue);
+        Sleep(0.2);
 
-    arm.SetDegree(180);
-    Sleep(1.0);
-    driveDistance(motorSpeed, 5);
-    arm.SetDegree(upDegrees+10);
-    Sleep(0.5);
-    driveDistance(motorSpeed, -3);
+        //If the cds value is reading blue, inch forward and read again
+        if (cdsValue > cdsBlueHighThresh)
+        {
+            pulse(slowMotorSpeed);
+            cdsValue = cdsCell.Value();
+            LCD.Clear();
+            LCD.WriteLine(cdsValue);
+            Sleep(0.2);
+        }
+    }
+
+
+    // Check which light
+    if (cdsValue > cdsRedHighThresh) // Blue
+    {
+        // LCD.Clear(BLUE);
+        LCD.WriteLine("Blue");
+        turnCenter(motorSpeed, -11);
+        driveTime(35, 3);
+    }
+    else // Red
+    {
+        // LCD.Clear(RED);
+        LCD.WriteLine("Red");
+        turnCenter(motorSpeed, 11);
+        driveTime(35, 3);
+    }
 }
