@@ -14,6 +14,7 @@ DigitalEncoder left_encoder(FEHIO::Pin10);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 FEHServo arm(FEHServo::Servo7);
+FEHServo compost(FEHServo::Servo5);
 
 const float countsPerInch = (318 / (PI * 3));
 const float countsPerDegrees = (6.9 * PI / 360) * countsPerInch; //6.875 og
@@ -253,8 +254,29 @@ void ERCMain()
     arm.SetMin(830);
     arm.SetMax(2500);
     arm.SetDegree(0);
+
+    compost.TouchCalibrate();
+
+    compost.SetMin(500);
+    compost.SetMax(2500);
+
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
+
+    while(true){
+        LCD.Clear();
+        LCD.Write("Spinning clockwise");
+        compost.SetDegree(100);
+        Sleep(2.0);
+        LCD.Clear();
+        LCD.Write("Stopping");
+        compost.SetDegree(85);
+        Sleep(2.0);
+        LCD.Clear();
+        LCD.Write("Turning counterclockwise");
+        compost.SetDegree(50);
+        Sleep(2.0);
+    }
 
 
     // RCS.InitializeTouchMenu("0910B8VYV");
