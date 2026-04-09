@@ -354,7 +354,7 @@ void ERCMain()
 
     // Wait for cds cell to read start light
 
-    /*
+    
     LCD.Clear();
     LCD.WriteLine("Waiting for start.");
     cdsValue = cdsCell.Value();
@@ -364,7 +364,7 @@ void ERCMain()
         LCD.Clear();
         LCD.WriteLine(cdsValue);
     }
-    */
+    
 
 
     // Drive into button.
