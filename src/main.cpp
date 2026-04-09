@@ -22,8 +22,8 @@ const float countsPerDegrees = (6.9 * PI / 360) * countsPerInch; // 6.875 og
 void driveTime(int percent, float seconds) // using encoders
 {
     // Set both motors to desired percent
-    right_motor.SetPercent(percent);
-    left_motor.SetPercent(percent);
+    right_motor.SetPercent(percent-1);
+    left_motor.SetPercent(percent+3);
 
     // While the timer is less than seconds,
     // keep running motors
@@ -53,8 +53,8 @@ void driveDistance(int percent, float inches) // using encoders
     }
 
     // Set both motors to desired percent
-    right_motor.SetPercent(percent);
-    left_motor.SetPercent(percent);
+    right_motor.SetPercent(percent-1);
+    left_motor.SetPercent(percent+3);
 
     // While the average of the left and right encoder is less than counts,
     // keep running motors
@@ -83,14 +83,14 @@ void turnCenter(int percent, int degrees) // Positive degrees turns right. Negat
     if (degrees > 0)
     {
         // Set both motors to desired percent
-        right_motor.SetPercent(-percent);
-        left_motor.SetPercent(percent);
+        right_motor.SetPercent(-(percent-1));
+        left_motor.SetPercent((percent+3));
     }
     else
     {
         // Set both motors to desired percent
-        right_motor.SetPercent(percent);
-        left_motor.SetPercent(-percent);
+        right_motor.SetPercent(percent-1);
+        left_motor.SetPercent(-(percent+3));
     }
 
     // Wait until the average of the left and right encoder is less than counts
@@ -112,8 +112,8 @@ void turnCenterTime(int percent, float seconds) // Positive degrees turns right.
     right_motor.Stop();
 
     // If degrees is positive, turn to right. If negative, turn left
-    right_motor.SetPercent(-percent);
-    left_motor.SetPercent(percent);
+    right_motor.SetPercent(-(percent-1));
+    left_motor.SetPercent((percent+3));
 
     Sleep(seconds);
 
@@ -213,40 +213,54 @@ void slowArmSetDegrees(float curentDegrees, float targetDegrees)
     }
 }
 
-
 /*------------ PID VARIABLES ----------*/
 const float inchesPerCount = 1 / countsPerInch;
-float pastTime = 0;
+float pastTimeLeft = 0;
+float pastTimeRight = 0;
 float changeInTime = 0;
-float pastError = 0;
+
+float pastErrorLeft = 0;
+float errorLeft = 0;
+float errorSumLeft = 0;
+
+float pastErrorRight = 0;
+float errorRight = 0;
+float errorSumRight = 0;
+
 float pastLeftCounts = 0;
 float pastRightCounts = 0;
 float changeInLeftCounts = 0;
 float changeInRightCounts = 0;
 float actualVelocity;
-float error = 0;
-float errorSum = 0;
+
 float PTerm = 0;
 float ITerm = 0;
 float DTerm = 0;
-float PConstant = 0.75;
-float IConstant = 0.7;
+float PConstant = 1.0;
+float IConstant = 0.02;
 float Dconstant = 0.25;
-float oldMotorSpeed = 25;
-
+float oldMotorSpeed = 50;
 
 void resetPIDVar()
 {
-    pastTime = 0;
+    pastTimeLeft = 0;
+    pastTimeRight = 0;
     changeInTime = 0;
-    pastError = 0;
+
+    pastErrorLeft = 0;
+    errorLeft = 0;
+    errorSumLeft = 0;
+
+    pastErrorRight = 0;
+    errorRight = 0;
+    errorSumRight = 0;
+
     pastLeftCounts = 0;
     pastRightCounts = 0;
     changeInLeftCounts = 0;
     changeInRightCounts = 0;
     actualVelocity;
-    error = 0;
-    errorSum = 0;
+
     PTerm = 0;
     ITerm = 0;
     DTerm = 0;
@@ -256,54 +270,57 @@ void resetPIDVar()
     oldMotorSpeed = 25;
     left_encoder.ResetCounts();
     right_encoder.ResetCounts();
+
+    pastTimeLeft = TimeNow();
+    pastTimeRight = TimeNow();
+
+    Sleep(0.1);
 }
-
-
 
 float LeftMotorPIDAdjustment(float expectedVelocity)
 {
     changeInLeftCounts = left_encoder.Counts() - pastLeftCounts;
-    changeInTime = TimeNow() - pastTime;
+    changeInTime = TimeNow() - pastTimeLeft;
     actualVelocity = inchesPerCount * (changeInLeftCounts / changeInTime);
-    error = expectedVelocity - actualVelocity;
-    errorSum += error;
+    errorLeft = expectedVelocity - actualVelocity;
+    errorSumLeft += errorLeft;
 
-    PTerm = error * PConstant;
-    ITerm = errorSum * IConstant;
-    DTerm = (error - pastError) * Dconstant;
-    pastError = error;
+    PTerm = errorLeft * PConstant;
+    ITerm = errorSumLeft * IConstant;
+    DTerm = (errorLeft - pastErrorLeft) * Dconstant;
+    pastErrorLeft = errorLeft;
     pastLeftCounts = left_encoder.Counts();
-    pastTime = TimeNow();
+    pastTimeLeft = TimeNow();
 
-    return (PTerm + ITerm + DTerm);
+    return (oldMotorSpeed + PTerm + ITerm + DTerm);
 }
 
 float RightMotorPIDAdjustment(float expectedVelocity)
 {
     changeInRightCounts = right_encoder.Counts() - pastRightCounts;
-    changeInTime = TimeNow() - pastTime;
+    changeInTime = TimeNow() - pastTimeRight;
     actualVelocity = inchesPerCount * (changeInRightCounts / changeInTime);
-    error = expectedVelocity - actualVelocity;
-    errorSum += error;
+    errorRight = expectedVelocity - actualVelocity;
+    errorSumRight += errorRight;
 
-    PTerm = error * PConstant;
-    ITerm = errorSum * IConstant;
-    DTerm = (error - pastError) * Dconstant;
-    pastError = error;
+    PTerm = errorRight * PConstant;
+    ITerm = errorSumRight * IConstant;
+    DTerm = (errorRight - pastErrorRight) * Dconstant;
+    pastErrorRight = errorRight;
     pastRightCounts = right_encoder.Counts();
-    pastTime = TimeNow();
+    pastTimeRight = TimeNow();
 
-    return (PTerm + ITerm + DTerm);
+    return (oldMotorSpeed + PTerm + ITerm + DTerm);
 }
 
 void driveDistancePID(float expectedVelocity, float distance)
 {
     resetPIDVar();
-    while (left_encoder.Counts() * inchesPerCount < distance && right_encoder.Counts() * inchesPerCount)
+    while (left_encoder.Counts() * inchesPerCount < distance && right_encoder.Counts() * inchesPerCount < distance)
     {
         left_motor.SetPercent(LeftMotorPIDAdjustment(expectedVelocity));
         right_motor.SetPercent(RightMotorPIDAdjustment(expectedVelocity));
-        Sleep(0.1);
+        Sleep(0.05);
     }
 
     left_motor.SetPercent(0);
@@ -317,7 +334,7 @@ void ERCMain()
     const int rampMotorSpeed = 50;
     const int fastMotorSpeed = 60;
     const float rampDistance = 27;
-    const float tableToWindowBackDist = 11.5;
+    const float tableToWindowBackDist = 11;
     const float tableToLeverBack = 5;
     const float tableToHumidifierBack = 1.3;
     const float windowForwardDist = 23;
@@ -341,20 +358,43 @@ void ERCMain()
     arm.SetMax(2500);
     arm.SetDegree(0);
 
-
     compost.SetMin(500);
     compost.SetMax(2500);
     compost.SetDegree(compostOff);
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
+    /*
+    while (true)
+    {
+        LCD.Clear();
+        LCD.Write("Touch to forward 15 inches");
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+        //driveDistancePID(7, 15);
+        driveDistance(motorSpeed, 15);
 
+        LCD.Clear();
+        LCD.Write("Touch to go again");
+
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+
+        LCD.WriteLine("Going");
+        //driveDistancePID(7, 15);
+        driveDistance(motorSpeed, 15);
+
+        Sleep(2.0);
+    }
+        */
 
     // RCS.InitializeTouchMenu("0910B8VYV");
 
     // Wait for cds cell to read start light
 
-    
+    /*
     LCD.Clear();
     LCD.WriteLine("Waiting for start.");
     cdsValue = cdsCell.Value();
@@ -364,8 +404,7 @@ void ERCMain()
         LCD.Clear();
         LCD.WriteLine(cdsValue);
     }
-    
-
+    */
 
     // Drive into button.
     LCD.Clear();
@@ -408,20 +447,7 @@ void ERCMain()
     // Drive to back wall
     driveDistance(motorSpeed, -10); // og -24
     driveDistance(fastMotorSpeed, -14);
-
-    //Turn to button and hit
-    turnCenter(motorSpeed, 70);
-    driveTime(-50, 2);
-    while(true)
-    {
-    }
-
-
-
-
-
-
-
+    driveTime(-motorSpeed, 2);
 
     // Drive to apple bucket
     driveDistance(motorSpeed, 15);
@@ -508,13 +534,46 @@ void ERCMain()
         // LCD.Clear(BLUE);
         LCD.WriteLine("Blue");
         turnCenter(motorSpeed, -11);
-        driveTime(35, 3);
+        driveTime(35, 1);
+
+        driveTime(-35, 1);
+        turnCenter(motorSpeed, 11);
+        
     }
     else // Red
     {
         // LCD.Clear(RED);
         LCD.WriteLine("Red");
         turnCenter(motorSpeed, 11);
-        driveTime(35, 3);
+        driveTime(35, 1);
+
+        driveTime(-35, 1);
+        turnCenter(motorSpeed, -11);
     }
+
+    //Drive to back wall.
+    driveDistance(fastMotorSpeed, -12);
+    driveTime(-motorSpeed, 2);
+    driveDistance(motorSpeed, 1);
+
+    //Turn to align with table
+    turnCenter(motorSpeed, 90);
+    driveTime(motorSpeed, 2);
+
+    // drive backwards away from table
+    driveDistance(motorSpeed, -tableToWindowBackDist);
+
+    //---Drive to window---
+
+    // Turn to window.
+    LCD.Clear();
+    LCD.WriteLine("Turning");
+    turnCenter(motorSpeed, -90);
+    driveTime(-motorSpeed, 1);
+
+    //Drive to window
+    driveDistance(slowMotorSpeed, windowForwardDist);
+    driveDistance(slowMotorSpeed, -windowForwardDist);
+    
+
 }
