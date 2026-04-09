@@ -213,6 +213,7 @@ void slowArmSetDegrees(float curentDegrees, float targetDegrees)
     }
 }
 
+
 /*------------ PID VARIABLES ----------*/
 const float inchesPerCount = 1 / countsPerInch;
 float pastTime = 0;
@@ -232,6 +233,7 @@ float PConstant = 0.75;
 float IConstant = 0.7;
 float Dconstant = 0.25;
 float oldMotorSpeed = 25;
+
 
 void resetPIDVar()
 {
@@ -256,19 +258,7 @@ void resetPIDVar()
     right_encoder.ResetCounts();
 }
 
-void driveDistancePID(float expectedVelocity, float distance)
-{
-    resetPIDVar();
-    while (left_encoder.Counts() * inchesPerCount < distance && right_encoder.Counts() * inchesPerCount)
-    {
-        left_motor.SetPercent(LeftMotorPIDAdjustment(expectedVelocity));
-        right_motor.SetPercent(RightMotorPIDAdjustment(expectedVelocity));
-        Sleep(0.1);
-    }
 
-    left_motor.SetPercent(0);
-    right_motor.SetPercent(0);
-}
 
 float LeftMotorPIDAdjustment(float expectedVelocity)
 {
@@ -306,6 +296,20 @@ float RightMotorPIDAdjustment(float expectedVelocity)
     return (PTerm + ITerm + DTerm);
 }
 
+void driveDistancePID(float expectedVelocity, float distance)
+{
+    resetPIDVar();
+    while (left_encoder.Counts() * inchesPerCount < distance && right_encoder.Counts() * inchesPerCount)
+    {
+        left_motor.SetPercent(LeftMotorPIDAdjustment(expectedVelocity));
+        right_motor.SetPercent(RightMotorPIDAdjustment(expectedVelocity));
+        Sleep(0.1);
+    }
+
+    left_motor.SetPercent(0);
+    right_motor.SetPercent(0);
+}
+
 void ERCMain()
 {
     const int slowMotorSpeed = 20; // Input power level here
@@ -323,6 +327,9 @@ void ERCMain()
     const float upDegrees = 50;
     const float appleUpDegrees = 95;
     const float parallelDegrees = 160;
+    const int compostOff = 84;
+    const int compostForward = 0;
+    const int compostBackward = 180;
 
     int x, y; // for touch screen
 
@@ -334,29 +341,14 @@ void ERCMain()
     arm.SetMax(2500);
     arm.SetDegree(0);
 
-    TestGUI();
 
     compost.SetMin(500);
     compost.SetMax(2500);
+    compost.SetDegree(compostOff);
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
 
-    while (true)
-    {
-        LCD.Clear();
-        LCD.Write("Spinning clockwise");
-        compost.SetDegree(100);
-        Sleep(2.0);
-        LCD.Clear();
-        LCD.Write("Stopping");
-        compost.SetDegree(85);
-        Sleep(2.0);
-        LCD.Clear();
-        LCD.Write("Turning counterclockwise");
-        compost.SetDegree(50);
-        Sleep(2.0);
-    }
 
     // RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -390,14 +382,17 @@ void ERCMain()
     driveDistance(motorSpeed, 12);
 
     // Turn on motor
+    compost.SetDegree(compostForward);
 
     // Turn wheel into compost bin
     turnCenterTime(-motorSpeed, 0.5);
 
-    // Wait 2 seconds, reverse motor
-
+    // Wait 1.5 seconds, reverse motor
+    Sleep(1.5);
+    compost.SetDegree(compostBackward);
     // Wait 2 seconds, turn off motor
-
+    Sleep(1.5);
+    compost.SetDegree(compostOff);
     // Go back to hit button.
 
     // Turn to apple stump and go forward slightly
@@ -414,6 +409,9 @@ void ERCMain()
     driveDistance(fastMotorSpeed, -14);
     driveTime(-motorSpeed, 2);
 
+
+
+    
     // Drive to apple bucket
     driveDistance(motorSpeed, 15);
     turnCenter(motorSpeed, 95);
