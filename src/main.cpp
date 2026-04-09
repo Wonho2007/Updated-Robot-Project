@@ -366,6 +366,7 @@ void ERCMain()
     }
     */
 
+
     // Drive into button.
     LCD.Clear();
     LCD.WriteLine("Driving");
@@ -375,23 +376,23 @@ void ERCMain()
 
     //---Drive to compost bin---
     // Drive forward
-    driveDistance(motorSpeed, 6);
+    driveDistance(motorSpeed, 4);
 
     // Turn to face compost bin, drive forward
-    turnCenter(motorSpeed, -50);
-    driveDistance(motorSpeed, 12);
+    turnCenter(motorSpeed, -40);
+    driveDistance(motorSpeed, 14);
 
     // Turn on motor
     compost.SetDegree(compostForward);
 
     // Turn wheel into compost bin
-    turnCenterTime(-motorSpeed, 0.5);
+    turnCenterTime(-motorSpeed, 0.7);
 
     // Wait 1.5 seconds, reverse motor
-    Sleep(1.5);
+    Sleep(1.25);
     compost.SetDegree(compostBackward);
     // Wait 2 seconds, turn off motor
-    Sleep(1.5);
+    Sleep(1.25);
     compost.SetDegree(compostOff);
     // Go back to hit button.
 
@@ -407,11 +408,21 @@ void ERCMain()
     // Drive to back wall
     driveDistance(motorSpeed, -10); // og -24
     driveDistance(fastMotorSpeed, -14);
-    driveTime(-motorSpeed, 2);
+
+    //Turn to button and hit
+    turnCenter(motorSpeed, 70);
+    driveTime(-50, 2);
+    while(true)
+    {
+    }
 
 
 
-    
+
+
+
+
+
     // Drive to apple bucket
     driveDistance(motorSpeed, 15);
     turnCenter(motorSpeed, 95);
