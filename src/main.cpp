@@ -21,9 +21,20 @@ const float countsPerDegrees = (6.9 * PI / 360) * countsPerInch; // 6.875 og
 
 void driveTime(int percent, float seconds) // using encoders
 {
+    
     // Set both motors to desired percent
-    right_motor.SetPercent(percent-1);
-    left_motor.SetPercent(percent+3);
+
+    if(percent > 0)
+    {
+        //Forward
+        right_motor.SetPercent(percent);
+        left_motor.SetPercent(percent+1);
+    } else
+    {
+        right_motor.SetPercent(percent);
+        left_motor.SetPercent(percent-2);
+    }
+    
 
     // While the timer is less than seconds,
     // keep running motors
@@ -47,14 +58,16 @@ void driveDistance(int percent, float inches) // using encoders
     left_encoder.ResetCounts();
 
     // If driving backwards, set negative percent
-    if (inches < 0)
-    {
-        percent = -1 * percent;
-    }
-
     // Set both motors to desired percent
-    right_motor.SetPercent(percent-1);
-    left_motor.SetPercent(percent+3);
+    if(inches > 0)
+    {
+        right_motor.SetPercent(percent);
+        left_motor.SetPercent(percent+1);
+    } else
+    {
+        right_motor.SetPercent(-percent);
+        left_motor.SetPercent(-percent-2);
+    }
 
     // While the average of the left and right encoder is less than counts,
     // keep running motors
@@ -83,22 +96,23 @@ void turnCenter(int percent, int degrees) // Positive degrees turns right. Negat
     if (degrees > 0)
     {
         // Set both motors to desired percent
-        right_motor.SetPercent(-(percent-1));
-        left_motor.SetPercent((percent+3));
+        right_motor.SetPercent(-percent);
+        left_motor.SetPercent((percent+4));
     }
     else
     {
         // Set both motors to desired percent
-        right_motor.SetPercent(percent-1);
-        left_motor.SetPercent(-(percent+3));
+        right_motor.SetPercent(percent);
+        left_motor.SetPercent(-percent-4);
     }
 
     // Wait until the average of the left and right encoder is less than counts
-    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
+    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts+8)
         ;
 
     right_motor.Stop();
     left_motor.Stop();
+    Sleep(0.1);
 }
 
 // Assumes percent > 0;
@@ -112,13 +126,14 @@ void turnCenterTime(int percent, float seconds) // Positive degrees turns right.
     right_motor.Stop();
 
     // If degrees is positive, turn to right. If negative, turn left
-    right_motor.SetPercent(-(percent-1));
-    left_motor.SetPercent((percent+3));
+    right_motor.SetPercent(-percent);
+    left_motor.SetPercent(percent);
 
     Sleep(seconds);
 
     right_motor.Stop();
     left_motor.Stop();
+    Sleep(0.1);
 }
 
 // Assumes percent > 0;
@@ -333,10 +348,10 @@ void ERCMain()
     const int motorSpeed = 25;
     const int rampMotorSpeed = 50;
     const int fastMotorSpeed = 60;
-    const float rampDistance = 27;
-    const float tableToWindowBackDist = 11;
+    const float rampDistance = 31;
+    const float tableToWindowBackDist = 6.5;
     const float tableToLeverBack = 5;
-    const float tableToHumidifierBack = 1.3;
+    const float tableToHumidifierBack = 1.25;
     const float windowForwardDist = 23;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueLowThresh = 0.55;
@@ -364,19 +379,20 @@ void ERCMain()
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
+    
     /*
     while (true)
     {
         LCD.Clear();
-        LCD.Write("Touch to forward 15 inches");
+        LCD.Write("Touch to turn 90");
         while (!LCD.Touch(&x, &y))
         {
         }
         //driveDistancePID(7, 15);
-        driveDistance(motorSpeed, 15);
+        turnCenter(motorSpeed, 90);
 
         LCD.Clear();
-        LCD.Write("Touch to go again");
+        LCD.Write("Turn center -90");
 
         while (!LCD.Touch(&x, &y))
         {
@@ -384,11 +400,13 @@ void ERCMain()
 
         LCD.WriteLine("Going");
         //driveDistancePID(7, 15);
-        driveDistance(motorSpeed, 15);
+        turnCenter(motorSpeed, -90);
 
-        Sleep(2.0);
+        
+        
     }
-        */
+    */
+        
 
     // RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -415,12 +433,13 @@ void ERCMain()
 
     //---Drive to compost bin---
     // Drive forward
-    driveDistance(motorSpeed, 4);
+    driveDistance(motorSpeed, 2.5);
 
     // Turn to face compost bin, drive forward
-    turnCenter(motorSpeed, -40);
-    driveDistance(motorSpeed, 14);
+    turnCenter(motorSpeed, -45);
+    driveDistance(motorSpeed, 16);
 
+    
     // Turn on motor
     compost.SetDegree(compostForward);
 
@@ -437,7 +456,7 @@ void ERCMain()
 
     // Turn to apple stump and go forward slightly
     Sleep(1.0);
-    turnCenter(motorSpeed, 45 + 90);
+    turnCenter(motorSpeed, 30 + 90);
     driveDistance(motorSpeed, 2);
 
     // Turn to left wall to align
@@ -451,14 +470,14 @@ void ERCMain()
 
     // Drive to apple bucket
     driveDistance(motorSpeed, 15);
-    turnCenter(motorSpeed, 95);
-    driveDistance(motorSpeed, 8);
-    turnCenter(motorSpeed, -92);
+    turnCenter(motorSpeed, 90);
+    driveDistance(motorSpeed, 6);
+    turnCenter(motorSpeed, -90);
 
     // Pick up bucket
     arm.SetDegree(parallelDegrees);
     Sleep(0.2);
-    driveDistance(motorSpeed, 2.5);
+    driveDistance(motorSpeed, 3.5);
 
     Sleep(0.2);
     LCD.WriteLine("raise arm");
@@ -554,11 +573,11 @@ void ERCMain()
     //Drive to back wall.
     driveDistance(fastMotorSpeed, -12);
     driveTime(-motorSpeed, 2);
-    driveDistance(motorSpeed, 1);
+    driveDistance(motorSpeed, 2);
 
     //Turn to align with table
     turnCenter(motorSpeed, 90);
-    driveTime(motorSpeed, 2);
+    driveTime(motorSpeed, 1);
 
     // drive backwards away from table
     driveDistance(motorSpeed, -tableToWindowBackDist);
