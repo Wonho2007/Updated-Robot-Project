@@ -460,7 +460,7 @@ void ERCMain()
 
     // Turn to face compost bin, drive forward
     turnCenter(motorSpeed, -48);
-    driveDistance(motorSpeed, 17);
+    driveDistance(motorSpeed, 15);
 
     
     // Turn on motor
@@ -525,6 +525,8 @@ void ERCMain()
 
     turnCenter(motorSpeed, -100);
 
+    arm.SetDegree(appleUpDegrees);
+
     driveTime(-motorSpeed, 2);
 
     driveDistance(motorSpeed, 2);
@@ -559,7 +561,7 @@ void ERCMain()
     // Inch towards light
     cdsValue = cdsCell.Value();
     int pulsesDone = 0;
-    while (cdsValue > cdsBlueHighThresh && pulsesDone < 6)
+    while (cdsValue > cdsBlueHighThresh && pulsesDone < 5)
     {
         pulse(slowMotorSpeed);
         pulsesDone++;
@@ -569,7 +571,7 @@ void ERCMain()
         Sleep(0.2);
 
         // If the cds value is reading blue, inch forward and read again
-        if (cdsValue > cdsBlueHighThresh)
+        if (cdsValue < cdsBlueHighThresh)
         {
             pulsesDone = 0;
             pulse(slowMotorSpeed);
@@ -581,7 +583,7 @@ void ERCMain()
     }
 
     //If timed out, set to red
-    if(pulsesDone >= 6)
+    if(pulsesDone >= 5)
     {
         cdsValue = 0.2;
     }
