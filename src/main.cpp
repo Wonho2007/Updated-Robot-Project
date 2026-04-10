@@ -556,10 +556,12 @@ void ERCMain()
     driveTime(-motorSpeed, 2);
 
     // Drive to humidifier light
-    driveDistance(motorSpeed, 15);
+    driveDistance(motorSpeed, 18);
 
     // Inch towards light
     cdsValue = cdsCell.Value();
+
+    /*
     int pulsesDone = 0;
     while (cdsValue > cdsBlueHighThresh && pulsesDone < 5)
     {
@@ -587,7 +589,12 @@ void ERCMain()
     {
         cdsValue = 0.2;
     }
+    */
     
+    if(cdsValue > cdsBlueHighThresh)
+    {
+        cdsValue = 0.2;
+    }
 
     // Check which light
     if (cdsValue > cdsRedHighThresh) // Blue
