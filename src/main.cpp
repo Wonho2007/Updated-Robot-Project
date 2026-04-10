@@ -346,10 +346,10 @@ void ERCMain()
 {
     const int slowMotorSpeed = 20; // Input power level here
     const int motorSpeed = 25;
-    const int rampMotorSpeed = 50;
+    const int rampMotorSpeed = 60;
     const int fastMotorSpeed = 60;
-    const float rampDistance = 31;
-    const float tableToWindowBackDist = 6.5;
+    const float rampDistance = 36;
+    const float tableToWindowBackDist = 6.8;
     const float tableToLeverBack = 5;
     const float tableToHumidifierBack = 1.25;
     const float windowForwardDist = 23;
@@ -357,7 +357,7 @@ void ERCMain()
     const float cdsBlueLowThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 50;
-    const float appleUpDegrees = 95;
+    const float appleUpDegrees = 105; //OG 95
     const float parallelDegrees = 160;
     const int compostOff = 84;
     const int compostForward = 0;
@@ -416,13 +416,36 @@ void ERCMain()
     LCD.Clear();
     LCD.WriteLine("Waiting for start.");
     cdsValue = cdsCell.Value();
-    while (cdsValue > cdsRedHighThresh)
+    boolean lightGoodTwice = false;
+    while (!lightGoodTwice)
     {
         cdsValue = cdsCell.Value();
         LCD.Clear();
         LCD.WriteLine(cdsValue);
+        if(cdsValue < cdsRedHighThresh)
+        {
+            Sleep(0.1);
+            cdsValue = cdsCell.Value();
+            if(cdsValue < cdsRedHighThresh)
+            {
+                lightGoodTwice = true;
+            }
+        }
     }
     */
+   
+    LCD.Clear();
+    LCD.Write("Touch to start");
+    while (!LCD.Touch(&x, &y))
+    {
+    }
+    while (LCD.Touch(&x, &y))
+    {
+    }
+
+
+
+
 
     // Drive into button.
     LCD.Clear();
@@ -436,8 +459,8 @@ void ERCMain()
     driveDistance(motorSpeed, 2.5);
 
     // Turn to face compost bin, drive forward
-    turnCenter(motorSpeed, -45);
-    driveDistance(motorSpeed, 16);
+    turnCenter(motorSpeed, -48);
+    driveDistance(motorSpeed, 17);
 
     
     // Turn on motor
@@ -452,8 +475,10 @@ void ERCMain()
     // Wait 2 seconds, turn off motor
     Sleep(1.25);
     compost.SetDegree(compostOff);
-    // Go back to hit button.
+  
 
+
+    //-------APPLE BUCKET---------
     // Turn to apple stump and go forward slightly
     Sleep(1.0);
     turnCenter(motorSpeed, 30 + 90);
@@ -466,24 +491,28 @@ void ERCMain()
     // Drive to back wall
     driveDistance(motorSpeed, -10); // og -24
     driveDistance(fastMotorSpeed, -14);
-    driveTime(-motorSpeed, 2);
+    driveTime(-motorSpeed, 1);
 
     // Drive to apple bucket
     driveDistance(motorSpeed, 15);
     turnCenter(motorSpeed, 90);
-    driveDistance(motorSpeed, 6);
+    driveDistance(motorSpeed, 5.8);
     turnCenter(motorSpeed, -90);
 
     // Pick up bucket
     arm.SetDegree(parallelDegrees);
     Sleep(0.2);
-    driveDistance(motorSpeed, 3.5);
+    driveDistance(motorSpeed, 3.8); //OG 3.5
 
     Sleep(0.2);
     LCD.WriteLine("raise arm");
 
     LCD.WriteLine("raising");
     arm.SetDegree(appleUpDegrees);
+    Sleep(0.2);
+    arm.SetDegree(upDegrees);
+    Sleep(0.2);
+    
 
     // Slightly turn and back up from tree
     turnCenter(motorSpeed, 25);
@@ -512,6 +541,7 @@ void ERCMain()
     // Drive into table
     Sleep(1.0);
     arm.SetDegree(upDegrees);
+    turnCenter(motorSpeed, -10);
     driveTime(motorSpeed, 1);
 
     // Back up from table, drive to levers
@@ -528,9 +558,11 @@ void ERCMain()
 
     // Inch towards light
     cdsValue = cdsCell.Value();
-    while (cdsValue > cdsBlueHighThresh)
+    int pulsesDone = 0;
+    while (cdsValue > cdsBlueHighThresh && pulsesDone < 6)
     {
         pulse(slowMotorSpeed);
+        pulsesDone++;
         cdsValue = cdsCell.Value();
         LCD.Clear();
         LCD.WriteLine(cdsValue);
@@ -539,6 +571,7 @@ void ERCMain()
         // If the cds value is reading blue, inch forward and read again
         if (cdsValue > cdsBlueHighThresh)
         {
+            pulsesDone = 0;
             pulse(slowMotorSpeed);
             cdsValue = cdsCell.Value();
             LCD.Clear();
@@ -546,6 +579,13 @@ void ERCMain()
             Sleep(0.2);
         }
     }
+
+    //If timed out, set to red
+    if(pulsesDone >= 6)
+    {
+        cdsValue = 0.2;
+    }
+    
 
     // Check which light
     if (cdsValue > cdsRedHighThresh) // Blue
@@ -588,7 +628,7 @@ void ERCMain()
     LCD.Clear();
     LCD.WriteLine("Turning");
     turnCenter(motorSpeed, -90);
-    driveTime(-motorSpeed, 1);
+    driveTime(-motorSpeed, 0.5);
 
     //Drive to window
     driveDistance(slowMotorSpeed, windowForwardDist);
