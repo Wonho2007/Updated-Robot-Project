@@ -346,10 +346,10 @@ void ERCMain()
 {
     const int slowMotorSpeed = 20; // Input power level here
     const int motorSpeed = 25;
-    const int rampMotorSpeed = 60;
+    const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
     const float rampDistance = 36;
-    const float tableToWindowBackDist = 6.8;
+    const float tableToWindowBackDist = 11;
     const float tableToLeverBack = 5;
     const float tableToHumidifierBack = 1.25;
     const float windowForwardDist = 23;
@@ -408,16 +408,20 @@ void ERCMain()
     */
         
 
-    // RCS.InitializeTouchMenu("0910B8VYV");
+    RCS.InitializeTouchMenu("0910B8VYV");
+
+    WaitForFinalAction();
 
     // Wait for cds cell to read start light
 
-    /*
+
     LCD.Clear();
     LCD.WriteLine("Waiting for start.");
     cdsValue = cdsCell.Value();
     boolean lightGoodTwice = false;
-    while (!lightGoodTwice)
+    float startTime = TimeNow();
+
+    while (!lightGoodTwice && startTime-TimeNow() < 32)
     {
         cdsValue = cdsCell.Value();
         LCD.Clear();
@@ -432,19 +436,7 @@ void ERCMain()
             }
         }
     }
-    */
-   
-    LCD.Clear();
-    LCD.Write("Touch to start");
-    while (!LCD.Touch(&x, &y))
-    {
-    }
-    while (LCD.Touch(&x, &y))
-    {
-    }
-
-
-
+    
 
 
     // Drive into button.
@@ -525,13 +517,17 @@ void ERCMain()
 
     turnCenter(motorSpeed, -100);
 
+    //Align with back wall
+
     arm.SetDegree(appleUpDegrees);
 
     driveTime(-motorSpeed, 2);
 
     driveDistance(motorSpeed, 2);
 
-    turnCenter(motorSpeed, 100);
+    //Turn to table
+
+    turnCenter(motorSpeed, 98);
 
     driveTime(motorSpeed, 2);
 
@@ -543,22 +539,21 @@ void ERCMain()
     // Drive into table
     Sleep(1.0);
     arm.SetDegree(upDegrees);
-    turnCenter(motorSpeed, -10);
     driveTime(motorSpeed, 1);
 
-    // Back up from table, drive to levers
+    // Back up from table, drive to humidifier
     driveDistance(motorSpeed, -tableToHumidifierBack);
 
     // Turn to humidifier.
     LCD.Clear();
     LCD.WriteLine("Turning");
-    turnCenter(motorSpeed, -93);
+    turnCenter(motorSpeed, -90);
     driveTime(-motorSpeed, 2);
 
     // Drive to humidifier light
     driveDistance(motorSpeed, 18);
 
-    // Inch towards light
+    
     cdsValue = cdsCell.Value();
 
     /*
@@ -594,6 +589,8 @@ void ERCMain()
     if(cdsValue > cdsBlueHighThresh)
     {
         cdsValue = 0.2;
+        LCD.WriteLine("TIME OUT, going red");
+        Sleep(2.0);
     }
 
     // Check which light
@@ -622,14 +619,14 @@ void ERCMain()
     //Drive to back wall.
     driveDistance(fastMotorSpeed, -12);
     driveTime(-motorSpeed, 2);
-    driveDistance(motorSpeed, 2);
+    driveDistance(motorSpeed, 4.2);
 
-    //Turn to align with table
-    turnCenter(motorSpeed, 90);
-    driveTime(motorSpeed, 1);
+    //Turn backwards to align with table
+    turnCenter(motorSpeed, -90);
+    driveTime(-motorSpeed, 1);
 
-    // drive backwards away from table
-    driveDistance(motorSpeed, -tableToWindowBackDist);
+    // drive forward towards window
+    driveDistance(motorSpeed, tableToWindowBackDist);
 
     //---Drive to window---
 
@@ -637,11 +634,14 @@ void ERCMain()
     LCD.Clear();
     LCD.WriteLine("Turning");
     turnCenter(motorSpeed, -90);
-    driveTime(-motorSpeed, 0.5);
+    driveTime(motorSpeed, 1);
 
     //Drive to window
     driveDistance(slowMotorSpeed, windowForwardDist);
     driveDistance(slowMotorSpeed, -windowForwardDist);
     
+    //align with back wall for levers
+    driveTime(motorSpeed, 1);
+
 
 }
