@@ -257,6 +257,22 @@ void bumpDriveBack(int percent)
     left_motor.SetPercent(0);
 }
 
+void hitLevers(int motorSpeed, int upDegrees)
+{
+    // Lower arm
+    arm.SetDegree(180);
+    Sleep(7.0);
+
+    driveDistance(motorSpeed, -4);
+
+    arm.SetDegree(180);
+    Sleep(1.0);
+    driveDistance(motorSpeed, 5);
+    arm.SetDegree(upDegrees + 10);
+    Sleep(0.5);
+    driveDistance(motorSpeed, -3);
+}
+
 /*------------ PID VARIABLES ----------*/
 const float inchesPerCount = 1 / countsPerInch;
 float pastTimeLeft = 0;
@@ -378,7 +394,7 @@ void ERCMain()
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
     const float rampDistance = 36;
-    const float tableToWindowBackDist = 10.75;
+    const float tableToWindowBackDist = 11.75;
     const float tableToLeverBack = 5;
     const float tableToHumidifierBack = 1.25;
     const float windowForwardDist = 23;
@@ -503,7 +519,7 @@ void ERCMain()
 
     // Turn to left wall to align
     turnCenter(motorSpeed, -94);
-    //driveTime(motorSpeed, 2);
+    // driveTime(motorSpeed, 2);
 
     // Drive to back wall
     driveDistance(motorSpeed, -10); // og -24
@@ -609,7 +625,7 @@ void ERCMain()
     }
     */
 
-    //If didn't read light
+    // If didn't read light
     if (cdsValue > cdsBlueHighThresh)
     {
         turnCenter(motorSpeed, -5);
@@ -659,7 +675,7 @@ void ERCMain()
 
     // Turn backwards to align with table
     turnCenter(motorSpeed, -90);
-    driveTime(-motorSpeed, 1);
+    driveTime(-motorSpeed, 3);
 
     // drive forward towards window
     driveDistance(motorSpeed, tableToWindowBackDist);
@@ -690,44 +706,27 @@ void ERCMain()
         driveDistance(motorSpeed, 21);
 
         turnCenter(motorSpeed, 52); // OG48
-        driveDistance(motorSpeed, 20);
+        driveDistance(motorSpeed, 15);
 
-        // Lower arm
-        arm.SetDegree(180);
-        Sleep(7.0);
-
-        driveDistance(motorSpeed, -4);
-
-        arm.SetDegree(180);
-        Sleep(1.0);
-        driveDistance(motorSpeed, 5);
-        arm.SetDegree(upDegrees + 10);
-        Sleep(0.5);
-        driveDistance(motorSpeed, -3);
+        hitLevers(motorSpeed, upDegrees);
     }
     else if (correctLever == 1)
     {
         // Perform actions to flip middle lever B
-        driveDistance(motorSpeed, 12);
+        driveDistance(motorSpeed, 11);
 
         turnCenter(motorSpeed, 52); // OG48
         driveDistance(motorSpeed, 13);
 
-        // Lower arm
-        arm.SetDegree(180);
-        Sleep(7.0);
-
-        driveDistance(motorSpeed, -4);
-
-        arm.SetDegree(180);
-        Sleep(1.0);
-        driveDistance(motorSpeed, 5);
-        arm.SetDegree(upDegrees + 10);
-        Sleep(0.5);
-        driveDistance(motorSpeed, -3);
+        hitLevers(motorSpeed, upDegrees);
     }
     else if (correctLever == 2)
     {
         // Perform actions to flip right lever C
+        driveDistance(motorSpeed, 7);
+        turnCenter(motorSpeed, 52); // OG48
+        driveDistance(motorSpeed, 13);
+
+        hitLevers(motorSpeed, upDegrees);
     }
 }
