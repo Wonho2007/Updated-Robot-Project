@@ -265,8 +265,6 @@ void hitLevers(int motorSpeed, int upDegrees)
 
     driveDistance(motorSpeed, -4);
 
-    arm.SetDegree(150);
-    Sleep(0.1);
     arm.SetDegree(180);
     Sleep(1.0);
     driveDistance(motorSpeed, 5);
@@ -427,6 +425,32 @@ void ERCMain()
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
 
+    /*
+    while (true)
+    {
+        LCD.Clear();
+        LCD.Write("Touch to turn 90");
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+        //driveDistancePID(7, 15);
+        turnCenter(motorSpeed, 90);
+
+        LCD.Clear();
+        LCD.Write("Turn center -90");
+
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+
+        LCD.WriteLine("Going");
+        //driveDistancePID(7, 15);
+        turnCenter(motorSpeed, -90);
+
+
+
+    }
+    */
 
     RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -505,7 +529,7 @@ void ERCMain()
     // Drive to apple bucket
     driveDistance(motorSpeed, 15);
     turnCenter(motorSpeed, 90);
-    driveDistance(motorSpeed, 6.9);
+    driveDistance(motorSpeed, 6.8);
     turnCenter(motorSpeed, -90);
 
     // Pick up bucket
@@ -601,35 +625,25 @@ void ERCMain()
     }
     */
 
-    // Check left and right
-    int leftCdsValue = 0;
-    int rightCdsValue = 0;
-    if (cdsValue > cdsRedHighThresh)
+    // If didn't read light
+    if (cdsValue > cdsBlueHighThresh)
     {
         turnCenter(motorSpeed, -2);
-        leftCdsValue = cdsCell.Value();
+        cdsValue = cdsCell.Value();
         turnCenter(motorSpeed, 2);
     }
 
-    if (cdsValue > cdsRedHighThresh && leftCdsValue > cdsRedHighThresh)
+    if (cdsValue > cdsBlueHighThresh)
     {
         turnCenter(motorSpeed, 2);
-        rightCdsValue = cdsCell.Value();
+        cdsValue = cdsCell.Value();
         turnCenter(motorSpeed, -2);
     }
 
-    if (cdsValue > cdsRedHighThresh && leftCdsValue > cdsRedHighThresh && rightCdsValue > cdsRedHighThresh)
+    if (cdsValue > cdsBlueHighThresh)
     {
         LCD.Write("TIME OUT: GOING RED");
         cdsValue = 0.20;
-    }
-
-    if(cdsValue > leftCdsValue)
-    {
-        cdsValue = leftCdsValue;
-    } else if (cdsValue > rightCdsValue)
-    {
-        cdsValue = rightCdsValue;
     }
 
     // Check which light
@@ -657,10 +671,10 @@ void ERCMain()
     // Drive to back wall.
     driveDistance(fastMotorSpeed, -12);
     bumpDriveBack(motorSpeed);
+    driveDistance(motorSpeed, 4.2);
 
-    // Drive off wall, turn back to window
-    driveDistance(motorSpeed, 4.3);
-    turnCenter(motorSpeed, -91);
+    // Turn backwards to align with table
+    turnCenter(motorSpeed, -90);
     driveTime(-motorSpeed, 3);
 
     // drive forward towards window
@@ -675,8 +689,8 @@ void ERCMain()
     driveTime(motorSpeed, 1);
 
     // Drive to window
-    driveDistance(motorSpeed, -windowForwardDist);
-    driveDistance(motorSpeed, windowForwardDist);
+    driveDistance(slowMotorSpeed, -windowForwardDist);
+    driveDistance(slowMotorSpeed, windowForwardDist);
 
     // align with back wall for levers
     turnCenter(motorSpeed, 180);
@@ -692,14 +706,14 @@ void ERCMain()
         driveDistance(motorSpeed, 21);
 
         turnCenter(motorSpeed, 52); // OG48
-        driveDistance(motorSpeed, 12);
+        driveDistance(motorSpeed, 15);
 
         hitLevers(motorSpeed, upDegrees);
     }
     else if (correctLever == 1)
     {
         // Perform actions to flip middle lever B
-        driveDistance(motorSpeed, 13);
+        driveDistance(motorSpeed, 11);
 
         turnCenter(motorSpeed, 52); // OG48
         driveDistance(motorSpeed, 13);
