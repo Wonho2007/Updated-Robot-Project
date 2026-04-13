@@ -519,11 +519,11 @@ void ERCMain()
 
     // Turn to left wall to align
     turnCenter(motorSpeed, -94);
-    // driveTime(motorSpeed, 2);
+    //driveTime(motorSpeed, 2);
 
     // Drive to back wall
-    driveDistance(motorSpeed, -10); // og -24
-    driveDistance(fastMotorSpeed, -14);
+    driveDistance(motorSpeed, -6); // og -24
+    driveDistance(fastMotorSpeed, -17);
     bumpDriveBack(motorSpeed);
 
     // Drive to apple bucket
@@ -573,11 +573,11 @@ void ERCMain()
 
     // Back up from table, drop off bucket
     arm.SetDegree(appleUpDegrees + 40);
-    Sleep(1.0);
+    Sleep(0.5);
     driveDistance(motorSpeed, -5);
 
     // Drive into table
-    Sleep(1.0);
+    Sleep(0.5);
     arm.SetDegree(upDegrees);
     driveTime(motorSpeed, 3);
 
@@ -724,6 +724,7 @@ void ERCMain()
     {
         // Perform actions to flip right lever C
         driveDistance(motorSpeed, 7);
+        
         turnCenter(motorSpeed, 52); // OG48
         driveDistance(motorSpeed, 13);
 
