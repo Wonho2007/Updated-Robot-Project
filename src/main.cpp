@@ -555,21 +555,22 @@ void ERCMain()
 
     driveDistance(rampMotorSpeed, rampDistance);
 
-    turnCenter(motorSpeed, -100);
+    //turnCenter(motorSpeed, -100);
 
     // Align with back wall
 
     arm.SetDegree(appleUpDegrees);
 
-    bumpDriveBack(motorSpeed);
+    //New for no alignment
+    driveTime(motorSpeed, 1);
 
-    driveDistance(motorSpeed, 2);
+    //bumpDriveBack(motorSpeed);
+    //driveDistance(motorSpeed, 2);
 
     // Turn to table
 
-    turnCenter(motorSpeed, 98);
-
-    driveTime(motorSpeed, 2);
+    //turnCenter(motorSpeed, 98);
+    //driveTime(motorSpeed, 2);
 
     // Back up from table, drop off bucket
     arm.SetDegree(appleUpDegrees + 40);
@@ -628,16 +629,16 @@ void ERCMain()
     // If didn't read light
     if (cdsValue > cdsBlueHighThresh)
     {
-        turnCenter(motorSpeed, -5);
+        turnCenter(motorSpeed, -2);
         cdsValue = cdsCell.Value();
-        turnCenter(motorSpeed, 5);
+        turnCenter(motorSpeed, 2);
     }
 
     if (cdsValue > cdsBlueHighThresh)
     {
-        turnCenter(motorSpeed, 5);
+        turnCenter(motorSpeed, 2);
         cdsValue = cdsCell.Value();
-        turnCenter(motorSpeed, -5);
+        turnCenter(motorSpeed, -2);
     }
 
     if (cdsValue > cdsBlueHighThresh)
@@ -723,10 +724,10 @@ void ERCMain()
     else if (correctLever == 2)
     {
         // Perform actions to flip right lever C
-        driveDistance(motorSpeed, 7);
+        driveDistance(motorSpeed, 6.5);
         
         turnCenter(motorSpeed, 52); // OG48
-        driveDistance(motorSpeed, 13);
+        driveDistance(motorSpeed, 11);
 
         hitLevers(motorSpeed, upDegrees);
     }
