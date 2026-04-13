@@ -16,25 +16,30 @@ FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 FEHServo arm(FEHServo::Servo5);
 FEHServo compost(FEHServo::Servo7);
 
+DigitalInputPin backLeftBumper(FEHIO::Pin15);
+DigitalInputPin backRightBumper(FEHIO::Pin0);
+// DigitalInputPin frontLeftBumper(FEHIO::Pin14);
+// DigitalInputPin frontRightBumper(FEHIO::Pin3);
+
 const float countsPerInch = (318 / (PI * 3));
 const float countsPerDegrees = (6.9 * PI / 360) * countsPerInch; // 6.875 og
 
 void driveTime(int percent, float seconds) // using encoders
 {
-    
+
     // Set both motors to desired percent
 
-    if(percent > 0)
+    if (percent > 0)
     {
-        //Forward
+        // Forward
         right_motor.SetPercent(percent);
-        left_motor.SetPercent(percent+1);
-    } else
-    {
-        right_motor.SetPercent(percent);
-        left_motor.SetPercent(percent-2);
+        left_motor.SetPercent(percent + 1);
     }
-    
+    else
+    {
+        right_motor.SetPercent(percent);
+        left_motor.SetPercent(percent - 2);
+    }
 
     // While the timer is less than seconds,
     // keep running motors
@@ -59,14 +64,15 @@ void driveDistance(int percent, float inches) // using encoders
 
     // If driving backwards, set negative percent
     // Set both motors to desired percent
-    if(inches > 0)
+    if (inches > 0)
     {
         right_motor.SetPercent(percent);
-        left_motor.SetPercent(percent+1);
-    } else
+        left_motor.SetPercent(percent + 1);
+    }
+    else
     {
         right_motor.SetPercent(-percent);
-        left_motor.SetPercent(-percent-2);
+        left_motor.SetPercent(-percent - 2);
     }
 
     // While the average of the left and right encoder is less than counts,
@@ -97,17 +103,17 @@ void turnCenter(int percent, int degrees) // Positive degrees turns right. Negat
     {
         // Set both motors to desired percent
         right_motor.SetPercent(-percent);
-        left_motor.SetPercent((percent+4));
+        left_motor.SetPercent((percent + 4));
     }
     else
     {
         // Set both motors to desired percent
         right_motor.SetPercent(percent);
-        left_motor.SetPercent(-percent-4);
+        left_motor.SetPercent(-percent - 4);
     }
 
     // Wait until the average of the left and right encoder is less than counts
-    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts+8)
+    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts + 8)
         ;
 
     right_motor.Stop();
@@ -226,6 +232,29 @@ void slowArmSetDegrees(float curentDegrees, float targetDegrees)
             }
         }
     }
+}
+
+void bumpDriveBack(int percent)
+{
+    right_motor.SetPercent(-percent);
+    left_motor.SetPercent(-percent - 2);
+    // Wait for back bumpers to get hit
+    while (backLeftBumper.Value() || backRightBumper.Value())
+    {
+        // If back left bumper gets hit
+        if (!backLeftBumper.Value())
+        {
+            left_motor.SetPercent(0);
+        }
+
+        if (!backRightBumper.Value())
+        {
+            right_motor.SetPercent(0);
+        }
+    }
+
+    right_motor.SetPercent(0);
+    left_motor.SetPercent(0);
 }
 
 /*------------ PID VARIABLES ----------*/
@@ -349,7 +378,7 @@ void ERCMain()
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
     const float rampDistance = 36;
-    const float tableToWindowBackDist = 11;
+    const float tableToWindowBackDist = 10.75;
     const float tableToLeverBack = 5;
     const float tableToHumidifierBack = 1.25;
     const float windowForwardDist = 23;
@@ -357,7 +386,7 @@ void ERCMain()
     const float cdsBlueLowThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 50;
-    const float appleUpDegrees = 105; //OG 95
+    const float appleUpDegrees = 105; // OG 95
     const float parallelDegrees = 160;
     const int compostOff = 84;
     const int compostForward = 0;
@@ -379,7 +408,7 @@ void ERCMain()
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
-    
+
     /*
     while (true)
     {
@@ -402,11 +431,10 @@ void ERCMain()
         //driveDistancePID(7, 15);
         turnCenter(motorSpeed, -90);
 
-        
-        
+
+
     }
     */
-        
 
     RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -414,37 +442,37 @@ void ERCMain()
 
     // Wait for cds cell to read start light
 
-
     LCD.Clear();
     LCD.WriteLine("Waiting for start.");
     cdsValue = cdsCell.Value();
     boolean lightGoodTwice = false;
     float startTime = TimeNow();
 
-    while (!lightGoodTwice && startTime-TimeNow() < 32)
+    while (!lightGoodTwice && startTime - TimeNow() < 32)
     {
         cdsValue = cdsCell.Value();
         LCD.Clear();
         LCD.WriteLine(cdsValue);
-        if(cdsValue < cdsRedHighThresh)
+        if (cdsValue < cdsRedHighThresh)
         {
             Sleep(0.1);
             cdsValue = cdsCell.Value();
-            if(cdsValue < cdsRedHighThresh)
+            if (cdsValue < cdsRedHighThresh)
             {
                 lightGoodTwice = true;
             }
         }
     }
-    
-
 
     // Drive into button.
     LCD.Clear();
     LCD.WriteLine("Driving");
-    Sleep(1);
-    driveTime(-motorSpeed, 0.5);
-    driveTime(motorSpeed, 0.5);
+
+    if (startTime - TimeNow() < 31)
+    {
+        driveTime(-motorSpeed, 0.5);
+        driveTime(motorSpeed, 0.5);
+    }
 
     //---Drive to compost bin---
     // Drive forward
@@ -454,7 +482,6 @@ void ERCMain()
     turnCenter(motorSpeed, -48);
     driveDistance(motorSpeed, 15);
 
-    
     // Turn on motor
     compost.SetDegree(compostForward);
 
@@ -467,8 +494,6 @@ void ERCMain()
     // Wait 2 seconds, turn off motor
     Sleep(1.25);
     compost.SetDegree(compostOff);
-  
-
 
     //-------APPLE BUCKET---------
     // Turn to apple stump and go forward slightly
@@ -477,24 +502,24 @@ void ERCMain()
     driveDistance(motorSpeed, 2);
 
     // Turn to left wall to align
-    turnCenter(motorSpeed, -90);
-    driveTime(motorSpeed, 2);
+    turnCenter(motorSpeed, -94);
+    //driveTime(motorSpeed, 2);
 
     // Drive to back wall
     driveDistance(motorSpeed, -10); // og -24
     driveDistance(fastMotorSpeed, -14);
-    driveTime(-motorSpeed, 1);
+    bumpDriveBack(motorSpeed);
 
     // Drive to apple bucket
     driveDistance(motorSpeed, 15);
     turnCenter(motorSpeed, 90);
-    driveDistance(motorSpeed, 5.8);
+    driveDistance(motorSpeed, 6.8);
     turnCenter(motorSpeed, -90);
 
     // Pick up bucket
     arm.SetDegree(parallelDegrees);
     Sleep(0.2);
-    driveDistance(motorSpeed, 3.8); //OG 3.5
+    driveDistance(motorSpeed, 3.8); // OG 3.5
 
     Sleep(0.2);
     LCD.WriteLine("raise arm");
@@ -504,7 +529,6 @@ void ERCMain()
     Sleep(0.2);
     arm.SetDegree(upDegrees);
     Sleep(0.2);
-    
 
     // Slightly turn and back up from tree
     turnCenter(motorSpeed, 25);
@@ -517,15 +541,15 @@ void ERCMain()
 
     turnCenter(motorSpeed, -100);
 
-    //Align with back wall
+    // Align with back wall
 
     arm.SetDegree(appleUpDegrees);
 
-    driveTime(-motorSpeed, 2);
+    bumpDriveBack(motorSpeed);
 
     driveDistance(motorSpeed, 2);
 
-    //Turn to table
+    // Turn to table
 
     turnCenter(motorSpeed, 98);
 
@@ -539,7 +563,7 @@ void ERCMain()
     // Drive into table
     Sleep(1.0);
     arm.SetDegree(upDegrees);
-    driveTime(motorSpeed, 1);
+    driveTime(motorSpeed, 3);
 
     // Back up from table, drive to humidifier
     driveDistance(motorSpeed, -tableToHumidifierBack);
@@ -548,12 +572,11 @@ void ERCMain()
     LCD.Clear();
     LCD.WriteLine("Turning");
     turnCenter(motorSpeed, -90);
-    driveTime(-motorSpeed, 2);
+    bumpDriveBack(motorSpeed);
 
     // Drive to humidifier light
     driveDistance(motorSpeed, 18);
 
-    
     cdsValue = cdsCell.Value();
 
     /*
@@ -585,12 +608,26 @@ void ERCMain()
         cdsValue = 0.2;
     }
     */
-    
-    if(cdsValue > cdsBlueHighThresh)
+
+    //If didn't read light
+    if (cdsValue > cdsBlueHighThresh)
     {
-        cdsValue = 0.2;
-        LCD.WriteLine("TIME OUT, going red");
-        Sleep(2.0);
+        turnCenter(motorSpeed, -5);
+        cdsValue = cdsCell.Value();
+        turnCenter(motorSpeed, 5);
+    }
+
+    if (cdsValue > cdsBlueHighThresh)
+    {
+        turnCenter(motorSpeed, 5);
+        cdsValue = cdsCell.Value();
+        turnCenter(motorSpeed, -5);
+    }
+
+    if (cdsValue > cdsBlueHighThresh)
+    {
+        LCD.Write("TIME OUT: GOING RED");
+        cdsValue = 0.20;
     }
 
     // Check which light
@@ -603,7 +640,6 @@ void ERCMain()
 
         driveTime(-35, 1);
         turnCenter(motorSpeed, 11);
-        
     }
     else // Red
     {
@@ -616,12 +652,12 @@ void ERCMain()
         turnCenter(motorSpeed, -11);
     }
 
-    //Drive to back wall.
+    // Drive to back wall.
     driveDistance(fastMotorSpeed, -12);
-    driveTime(-motorSpeed, 2);
+    bumpDriveBack(motorSpeed);
     driveDistance(motorSpeed, 4.2);
 
-    //Turn backwards to align with table
+    // Turn backwards to align with table
     turnCenter(motorSpeed, -90);
     driveTime(-motorSpeed, 1);
 
@@ -636,12 +672,62 @@ void ERCMain()
     turnCenter(motorSpeed, -90);
     driveTime(motorSpeed, 1);
 
-    //Drive to window
-    driveDistance(slowMotorSpeed, windowForwardDist);
+    // Drive to window
     driveDistance(slowMotorSpeed, -windowForwardDist);
-    
-    //align with back wall for levers
-    driveTime(motorSpeed, 1);
+    driveDistance(slowMotorSpeed, windowForwardDist);
 
+    // align with back wall for levers
+    turnCenter(motorSpeed, 180);
+    bumpDriveBack(motorSpeed);
 
+    // Get correct lever from the RCS
+    int correctLever = RCS.GetLever();
+
+    // Check which lever to flip and perform some action
+    if (correctLever == 0)
+    {
+        // Perform actions to flip left lever A
+        driveDistance(motorSpeed, 21);
+
+        turnCenter(motorSpeed, 52); // OG48
+        driveDistance(motorSpeed, 20);
+
+        // Lower arm
+        arm.SetDegree(180);
+        Sleep(7.0);
+
+        driveDistance(motorSpeed, -4);
+
+        arm.SetDegree(180);
+        Sleep(1.0);
+        driveDistance(motorSpeed, 5);
+        arm.SetDegree(upDegrees + 10);
+        Sleep(0.5);
+        driveDistance(motorSpeed, -3);
+    }
+    else if (correctLever == 1)
+    {
+        // Perform actions to flip middle lever B
+        driveDistance(motorSpeed, 12);
+
+        turnCenter(motorSpeed, 52); // OG48
+        driveDistance(motorSpeed, 13);
+
+        // Lower arm
+        arm.SetDegree(180);
+        Sleep(7.0);
+
+        driveDistance(motorSpeed, -4);
+
+        arm.SetDegree(180);
+        Sleep(1.0);
+        driveDistance(motorSpeed, 5);
+        arm.SetDegree(upDegrees + 10);
+        Sleep(0.5);
+        driveDistance(motorSpeed, -3);
+    }
+    else if (correctLever == 2)
+    {
+        // Perform actions to flip right lever C
+    }
 }
