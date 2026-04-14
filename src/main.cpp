@@ -356,19 +356,19 @@ void hitLevers(int motorSpeed, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(motorSpeed, -4);
-    Sleep(5.2);
+    Sleep(5.0);
 
     arm.SetDegree(150);
     Sleep(0.1);
     arm.SetDegree(180);
-    Sleep(1.0);
+    Sleep(0.1);
     driveDistance(motorSpeed, 5);
-    arm.SetDegree(upDegrees + 30);
-    Sleep(0.3);
+    arm.SetDegree(upDegrees);
+    Sleep(0.1);
     driveTime(-motorSpeed, 1);
     arm.SetDegree(180);
     driveDistance(motorSpeed, -2);
-    arm.SetDegree(upDegrees);
+    arm.SetDegree(50);
 }
 
 /*------------ PID VARIABLES ----------*/
@@ -499,7 +499,6 @@ void ERCMain()
     const float windowForwardDist = 23;
     const float windowBackDist = 15;
     const float cdsRedHighThresh = 0.55;
-    const float cdsBlueLowThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 50;
     const float appleUpDegrees = 105; // OG 95
@@ -524,6 +523,7 @@ void ERCMain()
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
+
 
     RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -586,12 +586,12 @@ void ERCMain()
 
     //-------APPLE BUCKET---------
     // Turn to apple stump and go forward slightly
-    turnCenter(motorSpeed, 20 + 90);
-    driveDistance(motorSpeed, 2);
+    turnCenter(motorSpeed, 23 + 90);
+    driveDistance(motorSpeed, 2.5); // OG 2
 
     // Turn to left wall to align
     turnCenter(motorSpeed, -90);
-    //bumpDriveForward(motorSpeed + 10);
+    // bumpDriveForward(motorSpeed + 10);
     driveTime(motorSpeed + 10, 2);
 
     // Drive to back wall
@@ -640,7 +640,7 @@ void ERCMain()
     // Turn to table
 
     turnCenter(motorSpeed, 98);
-    //bumpDriveFrontRight(motorSpeed);
+    // bumpDriveFrontRight(motorSpeed);
     driveTime(motorSpeed, 2);
 
     // Back up from table, drop off bucket
@@ -667,52 +667,23 @@ void ERCMain()
     driveDistance(motorSpeed, 18);
 
     cdsValue = cdsCell.Value();
-
-    /*
-    int pulsesDone = 0;
-    while (cdsValue > cdsBlueHighThresh && pulsesDone < 5)
-    {
-        pulse(slowMotorSpeed);
-        pulsesDone++;
-        cdsValue = cdsCell.Value();
-        LCD.Clear();
-        LCD.WriteLine(cdsValue);
-        Sleep(0.2);
-
-        // If the cds value is reading blue, inch forward and read again
-        if (cdsValue < cdsBlueHighThresh)
-        {
-            pulsesDone = 0;
-            pulse(slowMotorSpeed);
-            cdsValue = cdsCell.Value();
-            LCD.Clear();
-            LCD.WriteLine(cdsValue);
-            Sleep(0.2);
-        }
-    }
-
-    //If timed out, set to red
-    if(pulsesDone >= 5)
-    {
-        cdsValue = 0.2;
-    }
-    */
+    
 
     // Check left and right
-    int leftCdsValue = 0;
-    int rightCdsValue = 0;
+    float leftCdsValue = 0;
+    float rightCdsValue = 0;
     if (cdsValue > cdsRedHighThresh)
     {
         turnCenter(slowMotorSpeed, -2);
         leftCdsValue = cdsCell.Value();
         turnCenter(slowMotorSpeed, 2);
-    }
 
-    if (cdsValue > cdsRedHighThresh && leftCdsValue > cdsRedHighThresh)
-    {
-        turnCenter(slowMotorSpeed, 2);
-        rightCdsValue = cdsCell.Value();
-        turnCenter(slowMotorSpeed, -2);
+        if (leftCdsValue > cdsRedHighThresh)
+        {
+            turnCenter(slowMotorSpeed, 2);
+            rightCdsValue = cdsCell.Value();
+            turnCenter(slowMotorSpeed, -2);
+        }
     }
 
     if (cdsValue > leftCdsValue)
@@ -803,12 +774,12 @@ void ERCMain()
     if (correctLever == 0)
     {
         // Perform actions to flip left lever A
-        turnCenter(motorSpeed, -17);
+        turnCenter(motorSpeed, -23);
         driveDistance(motorSpeed, 1);
-        hitLevers(motorSpeed, upDegrees);
+        hitLevers(motorSpeed, parallelDegrees);
 
-        //Turn back and align with wall for button
-        turnCenter(motorSpeed, 17);
+        // Turn back and align with wall for button
+        turnCenter(motorSpeed, 23);
         driveDistance(motorSpeed, -13);
         turnCenter(motorSpeed, -52);
 
@@ -817,9 +788,9 @@ void ERCMain()
     else if (correctLever == 1)
     {
         // Perform actions to flip middle lever B
-        hitLevers(motorSpeed, upDegrees);
+        hitLevers(motorSpeed, parallelDegrees);
 
-        //Turn back and align with wall for button
+        // Turn back and align with wall for button
         driveDistance(motorSpeed, -13);
         turnCenter(motorSpeed, -52);
 
@@ -830,9 +801,9 @@ void ERCMain()
         // Perform actions to flip right lever C
         turnCenter(motorSpeed, 10);
         driveDistance(motorSpeed, 1);
-        hitLevers(motorSpeed, upDegrees);
+        hitLevers(motorSpeed, parallelDegrees);
 
-        //Turn back and align with wall for button
+        // Turn back and align with wall for button
         turnCenter(motorSpeed, -10);
         driveDistance(motorSpeed, -10);
         turnCenter(motorSpeed, -52);
@@ -840,7 +811,7 @@ void ERCMain()
         bumpDriveBack(motorSpeed);
     }
 
-    //Back off wall, drive to hit button
+    // Back off wall, drive to hit button
     driveDistance(motorSpeed, 3);
 
     turnCenter(motorSpeed, -93);
