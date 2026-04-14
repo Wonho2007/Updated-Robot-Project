@@ -16,10 +16,10 @@ FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 FEHServo arm(FEHServo::Servo5);
 FEHServo compost(FEHServo::Servo7);
 
-DigitalInputPin backLeftBumper(FEHIO::Pin15);
+DigitalInputPin backLeftBumper(FEHIO::Pin7);
 DigitalInputPin backRightBumper(FEHIO::Pin0);
-// DigitalInputPin frontLeftBumper(FEHIO::Pin14);
-// DigitalInputPin frontRightBumper(FEHIO::Pin3);
+DigitalInputPin frontLeftBumper(FEHIO::Pin6);
+DigitalInputPin frontRightBumper(FEHIO::Pin2);
 
 const float countsPerInch = (318 / (PI * 3));
 const float countsPerDegrees = (6.9 * PI / 360) * countsPerInch; // 6.875 og
@@ -273,6 +273,83 @@ void bumpDriveBack(int percent)
     left_motor.SetPercent(0);
 }
 
+void bumpDriveBackLeft(int percent)
+{
+    right_motor.SetPercent(-percent);
+    left_motor.SetPercent(-percent - 2);
+    // Wait for back bumpers to get hit
+    float startTime = TimeNow();
+    while (backLeftBumper.Value())
+    {
+        // break out if going backwards for 5 sec
+        if (TimeNow() - startTime > 5)
+        {
+            break;
+        }
+    }
+
+    right_motor.SetPercent(0);
+    left_motor.SetPercent(0);
+}
+
+void bumpDriveForward(int percent)
+{
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(percent + 2);
+    // Wait for back bumpers to get hit
+    float startTime = TimeNow();
+    while (frontLeftBumper.Value() || frontRightBumper.Value())
+    {
+        // If back left bumper gets hit
+        if (!frontLeftBumper.Value())
+        {
+            left_motor.SetPercent(0);
+        }
+
+        if (!frontRightBumper.Value())
+        {
+            right_motor.SetPercent(0);
+        }
+
+        // If either lever is down, wait 5 seconds before breaking out
+        if (!frontLeftBumper.Value() || !frontRightBumper.Value())
+        {
+            if (TimeNow() - startTime > 5)
+            {
+                break;
+            }
+        }
+
+        // break out if going backwards for 10 sec
+        if (TimeNow() - startTime > 10)
+        {
+            break;
+        }
+    }
+
+    right_motor.SetPercent(0);
+    left_motor.SetPercent(0);
+}
+
+void bumpDriveFrontRight(int percent)
+{
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(percent + 2);
+    // Wait for back bumpers to get hit
+    float startTime = TimeNow();
+    while (frontRightBumper.Value())
+    {
+        // break out if going backwards for 3 sec
+        if (TimeNow() - startTime > 3)
+        {
+            break;
+        }
+    }
+
+    right_motor.SetPercent(0);
+    left_motor.SetPercent(0);
+}
+
 void hitLevers(int motorSpeed, int upDegrees)
 {
     // Lower arm
@@ -286,9 +363,12 @@ void hitLevers(int motorSpeed, int upDegrees)
     arm.SetDegree(180);
     Sleep(1.0);
     driveDistance(motorSpeed, 5);
-    arm.SetDegree(upDegrees + 20);
+    arm.SetDegree(upDegrees + 30);
     Sleep(0.3);
-    driveDistance(motorSpeed, -3);
+    driveTime(-motorSpeed, 1);
+    arm.SetDegree(180);
+    driveDistance(motorSpeed, -2);
+    arm.SetDegree(upDegrees);
 }
 
 /*------------ PID VARIABLES ----------*/
@@ -485,7 +565,7 @@ void ERCMain()
 
     //---Drive to compost bin---
     // Drive forward
-    driveDistance(motorSpeed, 2.55);
+    driveDistance(motorSpeed, 2.6);
 
     // Turn to face compost bin, drive forward
     turnCenter(motorSpeed, -48);
@@ -506,12 +586,12 @@ void ERCMain()
 
     //-------APPLE BUCKET---------
     // Turn to apple stump and go forward slightly
-    Sleep(1.0);
-    turnCenter(motorSpeed, 30 + 90);
+    turnCenter(motorSpeed, 20 + 90);
     driveDistance(motorSpeed, 2);
 
     // Turn to left wall to align
-    turnCenter(motorSpeed, -96);
+    turnCenter(motorSpeed, -90);
+    //bumpDriveForward(motorSpeed + 10);
     driveTime(motorSpeed + 10, 2);
 
     // Drive to back wall
@@ -522,7 +602,7 @@ void ERCMain()
     // Drive to apple bucket
     driveDistance(motorSpeed, 15);
     turnCenter(motorSpeed, 90);
-    driveDistance(motorSpeed, 7.1);
+    driveDistance(motorSpeed, 7.0);
     turnCenter(motorSpeed, -90);
 
     // Pick up bucket
@@ -560,6 +640,7 @@ void ERCMain()
     // Turn to table
 
     turnCenter(motorSpeed, 98);
+    //bumpDriveFrontRight(motorSpeed);
     driveTime(motorSpeed, 2);
 
     // Back up from table, drop off bucket
@@ -656,9 +737,9 @@ void ERCMain()
         // LCD.Clear(BLUE);
         LCD.WriteLine("Blue");
         turnCenter(motorSpeed, -11);
-        driveTime(35, 1);
+        driveTime(37, 1);
 
-        driveTime(-35, 1);
+        driveTime(-37, 1);
         turnCenter(motorSpeed, 11);
     }
     else // Red
@@ -666,9 +747,9 @@ void ERCMain()
         // LCD.Clear(RED);
         LCD.WriteLine("Red");
         turnCenter(motorSpeed, 11);
-        driveTime(35, 1);
+        driveTime(37, 1);
 
-        driveTime(-35, 1);
+        driveTime(-37, 1);
         turnCenter(motorSpeed, -11);
     }
 
@@ -679,7 +760,7 @@ void ERCMain()
     // Drive off wall, turn back to window
     driveDistance(motorSpeed, 4.3);
     turnCenter(motorSpeed, -91);
-    driveTime(-motorSpeed, 2);
+    bumpDriveBackLeft(motorSpeed);
 
     // drive forward towards window
     driveDistance(motorSpeed, tableToWindowBackDist);
@@ -701,7 +782,7 @@ void ERCMain()
     driveTime(motorSpeed, 0.5);
 
     // align with back wall for levers
-    turnCenter(motorSpeed, 180);
+    turnCenter(motorSpeed, -180);
     bumpDriveBack(motorSpeed);
 
     // align with table
@@ -722,12 +803,12 @@ void ERCMain()
     if (correctLever == 0)
     {
         // Perform actions to flip left lever A
-        turnCenter(motorSpeed, -30);
+        turnCenter(motorSpeed, -17);
         driveDistance(motorSpeed, 1);
         hitLevers(motorSpeed, upDegrees);
 
         //Turn back and align with wall for button
-        turnCenter(motorSpeed, 30);
+        turnCenter(motorSpeed, 17);
         driveDistance(motorSpeed, -13);
         turnCenter(motorSpeed, -52);
 
@@ -747,20 +828,20 @@ void ERCMain()
     else if (correctLever == 2)
     {
         // Perform actions to flip right lever C
-        turnCenter(motorSpeed, 30);
+        turnCenter(motorSpeed, 10);
         driveDistance(motorSpeed, 1);
         hitLevers(motorSpeed, upDegrees);
 
         //Turn back and align with wall for button
-        turnCenter(motorSpeed, -30);
-        driveDistance(motorSpeed, -13);
+        turnCenter(motorSpeed, -10);
+        driveDistance(motorSpeed, -10);
         turnCenter(motorSpeed, -52);
 
         bumpDriveBack(motorSpeed);
     }
 
     //Back off wall, drive to hit button
-    driveDistance(motorSpeed, 2);
+    driveDistance(motorSpeed, 3);
 
     turnCenter(motorSpeed, -93);
     driveTime(fastMotorSpeed, 4);
