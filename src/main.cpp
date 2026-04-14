@@ -239,6 +239,7 @@ void bumpDriveBack(int percent)
     right_motor.SetPercent(-percent);
     left_motor.SetPercent(-percent - 2);
     // Wait for back bumpers to get hit
+    float startTime = TimeNow();
     while (backLeftBumper.Value() || backRightBumper.Value())
     {
         // If back left bumper gets hit
@@ -250,6 +251,21 @@ void bumpDriveBack(int percent)
         if (!backRightBumper.Value())
         {
             right_motor.SetPercent(0);
+        }
+        
+        //If either lever is down, wait 5 seconds before breaking out
+        if(!backLeftBumper.Value() ||!backRightBumper.Value())
+        {
+            if(TimeNow()-startTime > 5)
+            {
+                break;
+            }
+        }
+
+        //break out if going backwards for 10 sec
+        if(TimeNow()-startTime > 10)
+        {
+            break;
         }
     }
 
@@ -393,11 +409,12 @@ void ERCMain()
 {
     const int slowMotorSpeed = 20; // Input power level here
     const int motorSpeed = 25;
+    const int windowSpeed = 35;
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
     const float rampDistance = 36;
     const float tableToWindowBackDist = 11.75;
-    const float tableToLeverBack = 5;
+    const float tableToLeverBack = 6;
     const float tableToHumidifierBack = 1.25;
     const float windowForwardDist = 23;
     const float cdsRedHighThresh = 0.55;
@@ -409,6 +426,7 @@ void ERCMain()
     const int compostOff = 84;
     const int compostForward = 0;
     const int compostBackward = 180;
+    
 
     int x, y; // for touch screen
 
@@ -495,7 +513,7 @@ void ERCMain()
 
     // Turn to left wall to align
     turnCenter(motorSpeed, -96);
-    //driveTime(motorSpeed, 2);
+    driveTime(motorSpeed+10, 2);
 
     // Drive to back wall
     driveDistance(motorSpeed, -6); // og -24
@@ -505,7 +523,7 @@ void ERCMain()
     // Drive to apple bucket
     driveDistance(motorSpeed, 15);
     turnCenter(motorSpeed, 90);
-    driveDistance(motorSpeed, 6.9);
+    driveDistance(motorSpeed, 7.1);
     turnCenter(motorSpeed, -90);
 
     // Pick up bucket
@@ -517,6 +535,8 @@ void ERCMain()
     LCD.WriteLine("raise arm");
 
     LCD.WriteLine("raising");
+    arm.SetDegree(appleUpDegrees+20);
+    Sleep(0.3);
     arm.SetDegree(appleUpDegrees);
     Sleep(0.2);
     arm.SetDegree(upDegrees);
@@ -555,7 +575,7 @@ void ERCMain()
     // Drive into table
     Sleep(0.5);
     arm.SetDegree(upDegrees);
-    driveTime(motorSpeed, 3);
+    driveTime(motorSpeed, 1.5);
 
     // Back up from table, drive to humidifier
     driveDistance(motorSpeed, -tableToHumidifierBack);
@@ -661,7 +681,7 @@ void ERCMain()
     // Drive off wall, turn back to window
     driveDistance(motorSpeed, 4.3);
     turnCenter(motorSpeed, -91);
-    driveTime(-motorSpeed, 3);
+    driveTime(-motorSpeed, 2);
 
     // drive forward towards window
     driveDistance(motorSpeed, tableToWindowBackDist);
@@ -675,44 +695,44 @@ void ERCMain()
     driveTime(motorSpeed, 1);
 
     // Drive to window
-    driveDistance(motorSpeed, -windowForwardDist);
-    driveDistance(motorSpeed, windowForwardDist);
+    driveDistance(windowSpeed, -windowForwardDist);
+    driveDistance(windowSpeed, windowForwardDist);
 
     // align with back wall for levers
     turnCenter(motorSpeed, 180);
     bumpDriveBack(motorSpeed);
 
+    //align with table
+    // Drive off wall, drive into table
+    driveDistance(motorSpeed, 4.3);
+    turnCenter(motorSpeed, 91);
+    driveTime(motorSpeed, 3);
+    //back off table
+    driveDistance(motorSpeed, -tableToLeverBack);
+    //Turn to face levers, drive to levers
+    turnCenter(motorSpeed, -38);
+    driveDistance(motorSpeed, 15);
+
     // Get correct lever from the RCS
     int correctLever = RCS.GetLever();
+
 
     // Check which lever to flip and perform some action
     if (correctLever == 0)
     {
         // Perform actions to flip left lever A
-        driveDistance(motorSpeed, 21);
-
-        turnCenter(motorSpeed, 52); // OG48
-        driveDistance(motorSpeed, 12);
-
+        turnCenter(motorSpeed, -30);
         hitLevers(motorSpeed, upDegrees);
     }
     else if (correctLever == 1)
     {
         // Perform actions to flip middle lever B
-        driveDistance(motorSpeed, 13);
-
-        turnCenter(motorSpeed, 52); // OG48
-        driveDistance(motorSpeed, 13);
-
         hitLevers(motorSpeed, upDegrees);
     }
     else if (correctLever == 2)
     {
         // Perform actions to flip right lever C
-        driveDistance(motorSpeed, 6.5);
-        
-        turnCenter(motorSpeed, 52); // OG48
-        driveDistance(motorSpeed, 11);
+        turnCenter(motorSpeed, 30);
 
         hitLevers(motorSpeed, upDegrees);
     }
