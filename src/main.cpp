@@ -252,18 +252,18 @@ void bumpDriveBack(int percent)
         {
             right_motor.SetPercent(0);
         }
-        
-        //If either lever is down, wait 5 seconds before breaking out
-        if(!backLeftBumper.Value() ||!backRightBumper.Value())
+
+        // If either lever is down, wait 5 seconds before breaking out
+        if (!backLeftBumper.Value() || !backRightBumper.Value())
         {
-            if(TimeNow()-startTime > 5)
+            if (TimeNow() - startTime > 5)
             {
                 break;
             }
         }
 
-        //break out if going backwards for 10 sec
-        if(TimeNow()-startTime > 10)
+        // break out if going backwards for 10 sec
+        if (TimeNow() - startTime > 10)
         {
             break;
         }
@@ -412,11 +412,12 @@ void ERCMain()
     const int windowSpeed = 35;
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
-    const float rampDistance = 36;
-    const float tableToWindowBackDist = 11.75;
-    const float tableToLeverBack = 6;
+    const float rampDistance = 35;
+    const float tableToWindowBackDist = 12;
+    const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
     const float windowForwardDist = 23;
+    const float windowBackDist = 15;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueLowThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
@@ -426,7 +427,6 @@ void ERCMain()
     const int compostOff = 84;
     const int compostForward = 0;
     const int compostBackward = 180;
-    
 
     int x, y; // for touch screen
 
@@ -444,7 +444,6 @@ void ERCMain()
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
-
 
     RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -513,7 +512,7 @@ void ERCMain()
 
     // Turn to left wall to align
     turnCenter(motorSpeed, -96);
-    driveTime(motorSpeed+10, 2);
+    driveTime(motorSpeed + 10, 2);
 
     // Drive to back wall
     driveDistance(motorSpeed, -6); // og -24
@@ -535,8 +534,6 @@ void ERCMain()
     LCD.WriteLine("raise arm");
 
     LCD.WriteLine("raising");
-    arm.SetDegree(appleUpDegrees+20);
-    Sleep(0.3);
     arm.SetDegree(appleUpDegrees);
     Sleep(0.2);
     arm.SetDegree(upDegrees);
@@ -556,8 +553,6 @@ void ERCMain()
     // Align with back wall
 
     arm.SetDegree(appleUpDegrees);
-
-  
 
     bumpDriveBack(motorSpeed);
     driveDistance(motorSpeed, 2);
@@ -644,10 +639,11 @@ void ERCMain()
         cdsValue = 0.20;
     }
 
-    if(cdsValue > leftCdsValue)
+    if (cdsValue > leftCdsValue)
     {
         cdsValue = leftCdsValue;
-    } else if (cdsValue > rightCdsValue)
+    }
+    else if (cdsValue > rightCdsValue)
     {
         cdsValue = rightCdsValue;
     }
@@ -696,32 +692,36 @@ void ERCMain()
 
     // Drive to window
     driveDistance(windowSpeed, -windowForwardDist);
-    driveDistance(windowSpeed, windowForwardDist);
+    driveDistance(windowSpeed, windowBackDist);
+
+    // Turn to realign with back wall
+    turnCenter(motorSpeed, -20);
+    driveTime(motorSpeed, 0.5);
 
     // align with back wall for levers
     turnCenter(motorSpeed, 180);
     bumpDriveBack(motorSpeed);
 
-    //align with table
-    // Drive off wall, drive into table
+    // align with table
+    //  Drive off wall, drive into table
     driveDistance(motorSpeed, 4.3);
     turnCenter(motorSpeed, 91);
     driveTime(motorSpeed, 3);
-    //back off table
+    // back off table
     driveDistance(motorSpeed, -tableToLeverBack);
-    //Turn to face levers, drive to levers
+    // Turn to face levers, drive to levers
     turnCenter(motorSpeed, -38);
     driveDistance(motorSpeed, 15);
 
     // Get correct lever from the RCS
     int correctLever = RCS.GetLever();
 
-
     // Check which lever to flip and perform some action
     if (correctLever == 0)
     {
         // Perform actions to flip left lever A
         turnCenter(motorSpeed, -30);
+        driveDistance(motorSpeed, 1);
         hitLevers(motorSpeed, upDegrees);
     }
     else if (correctLever == 1)
@@ -733,7 +733,7 @@ void ERCMain()
     {
         // Perform actions to flip right lever C
         turnCenter(motorSpeed, 30);
-
+        driveDistance(motorSpeed, 1);
         hitLevers(motorSpeed, upDegrees);
     }
 }
