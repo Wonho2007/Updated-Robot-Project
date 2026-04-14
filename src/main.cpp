@@ -277,17 +277,17 @@ void hitLevers(int motorSpeed, int upDegrees)
 {
     // Lower arm
     arm.SetDegree(180);
-    Sleep(7.0);
-
+    Sleep(0.5);
     driveDistance(motorSpeed, -4);
+    Sleep(5.2);
 
     arm.SetDegree(150);
     Sleep(0.1);
     arm.SetDegree(180);
     Sleep(1.0);
     driveDistance(motorSpeed, 5);
-    arm.SetDegree(upDegrees + 10);
-    Sleep(0.5);
+    arm.SetDegree(upDegrees + 20);
+    Sleep(0.3);
     driveDistance(motorSpeed, -3);
 }
 
@@ -485,7 +485,7 @@ void ERCMain()
 
     //---Drive to compost bin---
     // Drive forward
-    driveDistance(motorSpeed, 2.5);
+    driveDistance(motorSpeed, 2.55);
 
     // Turn to face compost bin, drive forward
     turnCenter(motorSpeed, -48);
@@ -570,6 +570,7 @@ void ERCMain()
     // Drive into table
     Sleep(0.2);
     arm.SetDegree(upDegrees);
+    Sleep(0.2);
     driveTime(motorSpeed, 1.5);
 
     // Back up from table, drive to humidifier
@@ -621,31 +622,32 @@ void ERCMain()
     int rightCdsValue = 0;
     if (cdsValue > cdsRedHighThresh)
     {
-        turnCenter(motorSpeed, -2);
+        turnCenter(slowMotorSpeed, -2);
         leftCdsValue = cdsCell.Value();
-        turnCenter(motorSpeed, 2);
+        turnCenter(slowMotorSpeed, 2);
     }
 
     if (cdsValue > cdsRedHighThresh && leftCdsValue > cdsRedHighThresh)
     {
-        turnCenter(motorSpeed, 2);
+        turnCenter(slowMotorSpeed, 2);
         rightCdsValue = cdsCell.Value();
-        turnCenter(motorSpeed, -2);
-    }
-
-    if (cdsValue > cdsRedHighThresh && leftCdsValue > cdsRedHighThresh && rightCdsValue > cdsRedHighThresh)
-    {
-        LCD.Write("TIME OUT: GOING RED");
-        cdsValue = 0.20;
+        turnCenter(slowMotorSpeed, -2);
     }
 
     if (cdsValue > leftCdsValue)
     {
         cdsValue = leftCdsValue;
     }
-    else if (cdsValue > rightCdsValue)
+
+    if (cdsValue > rightCdsValue)
     {
         cdsValue = rightCdsValue;
+    }
+
+    if (cdsValue > cdsBlueHighThresh)
+    {
+        LCD.Write("TIME OUT: GOING RED");
+        cdsValue = 0.20;
     }
 
     // Check which light
@@ -723,11 +725,24 @@ void ERCMain()
         turnCenter(motorSpeed, -30);
         driveDistance(motorSpeed, 1);
         hitLevers(motorSpeed, upDegrees);
+
+        //Turn back and align with wall for button
+        turnCenter(motorSpeed, 30);
+        driveDistance(motorSpeed, -13);
+        turnCenter(motorSpeed, -52);
+
+        bumpDriveBack(motorSpeed);
     }
     else if (correctLever == 1)
     {
         // Perform actions to flip middle lever B
         hitLevers(motorSpeed, upDegrees);
+
+        //Turn back and align with wall for button
+        driveDistance(motorSpeed, -13);
+        turnCenter(motorSpeed, -52);
+
+        bumpDriveBack(motorSpeed);
     }
     else if (correctLever == 2)
     {
@@ -735,5 +750,18 @@ void ERCMain()
         turnCenter(motorSpeed, 30);
         driveDistance(motorSpeed, 1);
         hitLevers(motorSpeed, upDegrees);
+
+        //Turn back and align with wall for button
+        turnCenter(motorSpeed, -30);
+        driveDistance(motorSpeed, -13);
+        turnCenter(motorSpeed, -52);
+
+        bumpDriveBack(motorSpeed);
     }
+
+    //Back off wall, drive to hit button
+    driveDistance(motorSpeed, 2);
+
+    turnCenter(motorSpeed, -93);
+    driveTime(fastMotorSpeed, 4);
 }
