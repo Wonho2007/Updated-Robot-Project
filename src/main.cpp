@@ -564,11 +564,11 @@ void ERCMain()
 
     // Back up from table, drop off bucket
     arm.SetDegree(appleUpDegrees + 40);
-    Sleep(0.5);
+    Sleep(0.2);
     driveDistance(motorSpeed, -5);
 
     // Drive into table
-    Sleep(0.5);
+    Sleep(0.2);
     arm.SetDegree(upDegrees);
     driveTime(motorSpeed, 1.5);
 
