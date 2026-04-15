@@ -376,6 +376,33 @@ void hitLevers(int motorSpeed, int upDegrees)
     arm.SetDegree(50);
 }
 
+void hitLeverB(int motorSpeed, int upDegrees)
+{
+    // Lower arm
+    arm.SetDegree(180);
+    Sleep(0.5);
+    driveDistance(motorSpeed, -4);
+    Sleep(5.0);
+
+    arm.SetDegree(150);
+    Sleep(0.1);
+    arm.SetDegree(180);
+    Sleep(0.1);
+
+    //turn to get under lever
+    turnCenter(motorSpeed, 5);
+    driveDistance(motorSpeed, 4.5);
+    turnCenter(motorSpeed, -15);
+
+    arm.SetDegree(upDegrees);
+    Sleep(0.1);
+    driveTime(-motorSpeed, 1);
+    arm.SetDegree(180);
+    turnCenter(motorSpeed, 2);
+    driveDistance(motorSpeed, -2);
+    arm.SetDegree(50);
+}
+
 /*------------ PID VARIABLES ----------*/
 const float inchesPerCount = 1 / countsPerInch;
 float pastTimeLeft = 0;
@@ -800,7 +827,7 @@ void ERCMain()
     else if (correctLever == 1)
     {
         // Perform actions to flip middle lever B
-        hitLevers(motorSpeed, parallelDegrees);
+        hitLeverB(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
         driveDistance(motorSpeed, -13);
@@ -817,7 +844,7 @@ void ERCMain()
 
         // Turn back and align with wall for button
         turnCenter(motorSpeed, -10);
-        driveDistance(motorSpeed, -10);
+        driveDistance(motorSpeed, -8);
         turnCenter(motorSpeed, -52);
 
         bumpDriveBack(motorSpeed);
