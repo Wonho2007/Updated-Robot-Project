@@ -350,7 +350,32 @@ void bumpDriveFrontRight(int percent)
     left_motor.SetPercent(0);
 }
 
-void hitLevers(int motorSpeed, int upDegrees)
+void hitLeverA(int motorSpeed, int upDegrees)
+{
+    // Lower arm
+    arm.SetDegree(180);
+    Sleep(0.5);
+    driveDistance(motorSpeed, -4);
+    Sleep(4.4);
+
+    arm.SetDegree(150);
+    Sleep(0.1);
+    arm.SetDegree(180);
+    Sleep(0.1);
+
+    // turn to get under lever
+    turnCenter(motorSpeed, 5);
+    driveDistance(motorSpeed, 4);
+    turnCenter(motorSpeed, -12);
+
+    arm.SetDegree(upDegrees);
+    Sleep(0.1);
+    driveTime(-motorSpeed, 1);
+    arm.SetDegree(180);
+    arm.SetDegree(50);
+}
+
+void hitLeverC(int motorSpeed, int upDegrees)
 {
     // Lower arm
     arm.SetDegree(180);
@@ -524,7 +549,7 @@ void ERCMain()
     const int windowSpeed = 35;
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
-    const float rampDistance = 35;
+    const float rampDistance = 34.5;
     const float tableToWindowBackDist = 12;
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
@@ -533,7 +558,7 @@ void ERCMain()
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 43; // og 50
-    const float appleUpDegrees = 105; // OG 95
+    const float appleUpDegrees = 95; // OG 95
     const float parallelDegrees = 150; // OG 160
     const int compostOff = 84;
     const int compostForward = 0;
@@ -817,13 +842,13 @@ void ERCMain()
     if (correctLever == 0)
     {
         // Perform actions to flip left lever A
-        turnCenter(motorSpeed, -22);
+        turnCenter(motorSpeed, -26);
         driveDistance(motorSpeed, 2);
-        hitLevers(motorSpeed, parallelDegrees);
+        hitLeverA(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
-        turnCenter(motorSpeed, 23);
-        driveDistance(motorSpeed, -12);
+        turnCenter(motorSpeed, 27);
+        driveDistance(motorSpeed, -10);
         turnCenter(motorSpeed, -52);
 
         bumpDriveBack(motorSpeed);
@@ -844,7 +869,7 @@ void ERCMain()
         // Perform actions to flip right lever C
         turnCenter(motorSpeed, 10);
         driveDistance(motorSpeed, 1);
-        hitLevers(motorSpeed, parallelDegrees);
+        hitLeverB(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
         turnCenter(motorSpeed, -10);
