@@ -356,14 +356,14 @@ void hitLevers(int motorSpeed, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(motorSpeed, -4);
-    Sleep(5.0);
+    Sleep(4.4);
 
     arm.SetDegree(150);
     Sleep(0.1);
     arm.SetDegree(180);
     Sleep(0.1);
 
-    //turn to get under lever
+    // turn to get under lever
     turnCenter(motorSpeed, 5);
     driveDistance(motorSpeed, 4);
     turnCenter(motorSpeed, -12);
@@ -382,14 +382,14 @@ void hitLeverB(int motorSpeed, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(motorSpeed, -4);
-    Sleep(5.0);
+    Sleep(4.4);
 
     arm.SetDegree(150);
     Sleep(0.1);
     arm.SetDegree(180);
     Sleep(0.1);
 
-    //turn to get under lever
+    // turn to get under lever
     turnCenter(motorSpeed, 5);
     driveDistance(motorSpeed, 4.5);
     turnCenter(motorSpeed, -15);
@@ -532,9 +532,9 @@ void ERCMain()
     const float windowBackDist = 11;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
-    const float upDegrees = 50;
+    const float upDegrees = 43; // og 50
     const float appleUpDegrees = 105; // OG 95
-    const float parallelDegrees = 160;
+    const float parallelDegrees = 150; // OG 160
     const int compostOff = 84;
     const int compostForward = 0;
     const int compostBackward = 180;
@@ -545,7 +545,7 @@ void ERCMain()
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
 
-    arm.SetMin(830);
+    arm.SetMin(800);
     arm.SetMax(2500);
     arm.SetDegree(0);
 
@@ -555,7 +555,6 @@ void ERCMain()
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
-
 
     RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -628,12 +627,12 @@ void ERCMain()
 
     // Drive to back wall
     driveDistance(motorSpeed, -13);
-    //driveDistance(motorSpeed, -6);
-    //driveDistance(fastMotorSpeed, -16);
-    //bumpDriveBack(motorSpeed);
+    // driveDistance(motorSpeed, -6);
+    // driveDistance(fastMotorSpeed, -16);
+    // bumpDriveBack(motorSpeed);
 
     // Drive to apple bucket
-    //driveDistance(motorSpeed, 15);
+    // driveDistance(motorSpeed, 15);
     turnCenter(motorSpeed, 90);
     driveDistance(motorSpeed, 6.6);
     turnCenter(motorSpeed, -90);
@@ -700,35 +699,42 @@ void ERCMain()
     driveDistance(motorSpeed, 18);
 
     cdsValue = cdsCell.Value();
-    
 
     // Check left and right
     float leftCdsValue = 5;
     float rightCdsValue = 5;
+    // If reading not red, turn left and check
     if (cdsValue > cdsRedHighThresh)
     {
         turnCenter(slowMotorSpeed, -2);
-        float leftCdsValue = cdsCell.Value();
+        leftCdsValue = cdsCell.Value();
         turnCenter(slowMotorSpeed, 2);
 
+        //If left wiggle wasn't red either, check right
         if (leftCdsValue > cdsRedHighThresh)
         {
             turnCenter(slowMotorSpeed, 2);
             rightCdsValue = cdsCell.Value();
             turnCenter(slowMotorSpeed, -2);
         }
-    }
 
-    if (cdsValue > leftCdsValue)
-    {
-        cdsValue = leftCdsValue;
-        turnCenter(motorSpeed, 2);
-    }
+        //If to the right of the light
+        if (cdsValue > leftCdsValue)
+        {
+            cdsValue = leftCdsValue;
+            turnCenter(motorSpeed, -2);
+            driveDistance(motorSpeed, 0.4);
+            turnCenter(motorSpeed, 2);
+        }
 
-    if (cdsValue > rightCdsValue)
-    {
-        cdsValue = rightCdsValue;
-        turnCenter(motorSpeed, -2);
+        //If to the left of the light
+        if (cdsValue > rightCdsValue)
+        {
+            cdsValue = rightCdsValue;
+            turnCenter(motorSpeed, 2);
+            driveDistance(motorSpeed, 0.4);
+            turnCenter(motorSpeed, -2);
+        }
     }
 
     if (cdsValue > cdsBlueHighThresh)
@@ -737,9 +743,7 @@ void ERCMain()
         cdsValue = 0.20;
     }
 
-    //CHECK WHICH SIDE WIGGLE WORKED
-
-
+    // CHECK WHICH SIDE WIGGLE WORKED
 
     // Check which light
     if (cdsValue > cdsRedHighThresh) // Blue
