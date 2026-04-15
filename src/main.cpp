@@ -648,7 +648,7 @@ void ERCMain()
 
     LCD.WriteLine("raising");
     arm.SetDegree(appleUpDegrees);
-    Sleep(0.2);
+    Sleep(0.5);
     arm.SetDegree(upDegrees);
     Sleep(0.4);
 
