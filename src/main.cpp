@@ -362,7 +362,12 @@ void hitLevers(int motorSpeed, int upDegrees)
     Sleep(0.1);
     arm.SetDegree(180);
     Sleep(0.1);
-    driveDistance(motorSpeed, 5);
+
+    //turn to get under lever
+    turnCenter(motorSpeed, 5);
+    driveDistance(motorSpeed, 4);
+    turnCenter(motorSpeed, -12);
+
     arm.SetDegree(upDegrees);
     Sleep(0.1);
     driveTime(-motorSpeed, 1);
@@ -497,7 +502,7 @@ void ERCMain()
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
     const float windowForwardDist = 23;
-    const float windowBackDist = 15;
+    const float windowBackDist = 11;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 50;
@@ -565,7 +570,7 @@ void ERCMain()
 
     //---Drive to compost bin---
     // Drive forward
-    driveDistance(motorSpeed, 2.6);
+    driveDistance(motorSpeed, 2.9);
 
     // Turn to face compost bin, drive forward
     turnCenter(motorSpeed, -48);
@@ -592,23 +597,24 @@ void ERCMain()
     // Turn to left wall to align
     turnCenter(motorSpeed, -90);
     // bumpDriveForward(motorSpeed + 10);
-    driveTime(motorSpeed + 10, 2);
+    driveTime(motorSpeed + 10, 1);
 
     // Drive to back wall
-    driveDistance(motorSpeed, -6); // og -24
-    driveDistance(fastMotorSpeed, -16);
-    bumpDriveBack(motorSpeed);
+    driveDistance(motorSpeed, -13);
+    //driveDistance(motorSpeed, -6);
+    //driveDistance(fastMotorSpeed, -16);
+    //bumpDriveBack(motorSpeed);
 
     // Drive to apple bucket
-    driveDistance(motorSpeed, 15);
+    //driveDistance(motorSpeed, 15);
     turnCenter(motorSpeed, 90);
-    driveDistance(motorSpeed, 7.0);
+    driveDistance(motorSpeed, 6.6);
     turnCenter(motorSpeed, -90);
 
     // Pick up bucket
     arm.SetDegree(parallelDegrees);
     Sleep(0.2);
-    driveDistance(motorSpeed, 3.8); // OG 3.5
+    driveDistance(motorSpeed, 3.9); // OG 3.5
 
     Sleep(0.2);
     LCD.WriteLine("raise arm");
@@ -617,7 +623,7 @@ void ERCMain()
     arm.SetDegree(appleUpDegrees);
     Sleep(0.2);
     arm.SetDegree(upDegrees);
-    Sleep(0.2);
+    Sleep(0.4);
 
     // Slightly turn and back up from tree
     turnCenter(motorSpeed, 25);
@@ -670,12 +676,12 @@ void ERCMain()
     
 
     // Check left and right
-    float leftCdsValue = 0;
-    float rightCdsValue = 0;
+    float leftCdsValue = 5;
+    float rightCdsValue = 5;
     if (cdsValue > cdsRedHighThresh)
     {
         turnCenter(slowMotorSpeed, -2);
-        leftCdsValue = cdsCell.Value();
+        float leftCdsValue = cdsCell.Value();
         turnCenter(slowMotorSpeed, 2);
 
         if (leftCdsValue > cdsRedHighThresh)
@@ -689,11 +695,13 @@ void ERCMain()
     if (cdsValue > leftCdsValue)
     {
         cdsValue = leftCdsValue;
+        turnCenter(motorSpeed, 2);
     }
 
     if (cdsValue > rightCdsValue)
     {
         cdsValue = rightCdsValue;
+        turnCenter(motorSpeed, -2);
     }
 
     if (cdsValue > cdsBlueHighThresh)
@@ -701,6 +709,10 @@ void ERCMain()
         LCD.Write("TIME OUT: GOING RED");
         cdsValue = 0.20;
     }
+
+    //CHECK WHICH SIDE WIGGLE WORKED
+
+
 
     // Check which light
     if (cdsValue > cdsRedHighThresh) // Blue
@@ -718,9 +730,9 @@ void ERCMain()
         // LCD.Clear(RED);
         LCD.WriteLine("Red");
         turnCenter(motorSpeed, 11);
-        driveTime(37, 1);
+        driveTime(37, 1.2);
 
-        driveTime(-37, 1);
+        driveTime(-37, 1.2);
         turnCenter(motorSpeed, -11);
     }
 
@@ -750,7 +762,7 @@ void ERCMain()
 
     // Turn to realign with back wall
     turnCenter(motorSpeed, -20);
-    driveTime(motorSpeed, 0.5);
+    driveDistance(motorSpeed, 3);
 
     // align with back wall for levers
     turnCenter(motorSpeed, -180);
@@ -765,7 +777,7 @@ void ERCMain()
     driveDistance(motorSpeed, -tableToLeverBack);
     // Turn to face levers, drive to levers
     turnCenter(motorSpeed, -38);
-    driveDistance(motorSpeed, 15);
+    driveDistance(motorSpeed, 15.5);
 
     // Get correct lever from the RCS
     int correctLever = RCS.GetLever();
@@ -774,13 +786,13 @@ void ERCMain()
     if (correctLever == 0)
     {
         // Perform actions to flip left lever A
-        turnCenter(motorSpeed, -23);
-        driveDistance(motorSpeed, 1);
+        turnCenter(motorSpeed, -22);
+        driveDistance(motorSpeed, 2);
         hitLevers(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
         turnCenter(motorSpeed, 23);
-        driveDistance(motorSpeed, -13);
+        driveDistance(motorSpeed, -12);
         turnCenter(motorSpeed, -52);
 
         bumpDriveBack(motorSpeed);
