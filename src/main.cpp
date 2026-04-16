@@ -934,10 +934,10 @@ void ERCMain()
     openWindow(windowSpeed);
 
     //Realign around window
-    driveDistance(motorSpeed, 3);
-    turnCenter(motorSpeed, 40);
+    driveDistance(motorSpeed, 2);
+    turnCenter(motorSpeed, 20);
 
-    driveDistance(motorSpeed, -4);
+    driveDistance(motorSpeed, -3);
     turnCenter(motorSpeed, -20);
 
     //Close window
