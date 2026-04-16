@@ -247,10 +247,18 @@ void bumpDriveBack(int percent)
         {
             left_motor.SetPercent(0);
         }
+        else
+        {
+            left_motor.SetPercent(-percent - 2);
+        }
 
         if (!backRightBumper.Value())
         {
             right_motor.SetPercent(0);
+        }
+        else
+        {
+            right_motor.SetPercent(-percent);
         }
 
         // If either lever is down, wait 5 seconds before breaking out
@@ -557,8 +565,8 @@ void ERCMain()
     const float windowBackDist = 11;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
-    const float upDegrees = 43; // og 50
-    const float appleUpDegrees = 95; // OG 95
+    const float upDegrees = 43;        // og 50
+    const float appleUpDegrees = 95;   // OG 95
     const float parallelDegrees = 150; // OG 160
     const int compostOff = 84;
     const int compostForward = 0;
@@ -735,7 +743,7 @@ void ERCMain()
         leftCdsValue = cdsCell.Value();
         turnCenter(slowMotorSpeed, 2);
 
-        //If left wiggle wasn't red either, check right
+        // If left wiggle wasn't red either, check right
         if (leftCdsValue > cdsRedHighThresh)
         {
             turnCenter(slowMotorSpeed, 2);
@@ -743,7 +751,7 @@ void ERCMain()
             turnCenter(slowMotorSpeed, -2);
         }
 
-        //If to the right of the light
+        // If to the right of the light
         if (cdsValue > leftCdsValue)
         {
             cdsValue = leftCdsValue;
@@ -752,7 +760,7 @@ void ERCMain()
             turnCenter(motorSpeed, 2);
         }
 
-        //If to the left of the light
+        // If to the left of the light
         if (cdsValue > rightCdsValue)
         {
             cdsValue = rightCdsValue;
@@ -796,33 +804,10 @@ void ERCMain()
     driveDistance(fastMotorSpeed, -12);
     bumpDriveBack(motorSpeed);
 
-    // Drive off wall, turn back to window
-    driveDistance(motorSpeed, 4.3);
-    turnCenter(motorSpeed, -91);
-    bumpDriveBackLeft(motorSpeed);
 
-    // drive forward towards window
-    driveDistance(motorSpeed, tableToWindowBackDist);
 
-    //---Drive to window---
 
-    // Turn to window.
-    LCD.Clear();
-    LCD.WriteLine("Turning");
-    turnCenter(motorSpeed, -90);
-    driveTime(motorSpeed, 1);
 
-    // Drive to window
-    driveDistance(windowSpeed, -windowForwardDist);
-    driveDistance(windowSpeed, windowBackDist);
-
-    // Turn to realign with back wall
-    turnCenter(motorSpeed, -20);
-    driveDistance(motorSpeed, 3);
-
-    // align with back wall for levers
-    turnCenter(motorSpeed, -180);
-    bumpDriveBack(motorSpeed);
 
     // align with table
     //  Drive off wall, drive into table
@@ -878,6 +863,40 @@ void ERCMain()
 
         bumpDriveBack(motorSpeed);
     }
+
+
+
+
+    
+
+    // Drive off wall, turn back to window
+    driveDistance(motorSpeed, 4.3);
+
+    turnCenter(motorSpeed, -91);
+    bumpDriveBackLeft(motorSpeed);
+
+    // drive forward towards window
+    driveDistance(motorSpeed, tableToWindowBackDist);
+
+    //---Drive to window---
+
+    // Turn to window.
+    LCD.Clear();
+    LCD.WriteLine("Turning");
+    turnCenter(motorSpeed, -90);
+    driveTime(motorSpeed, 1);
+
+    // Drive to window
+    driveDistance(windowSpeed, -windowForwardDist);
+    driveDistance(windowSpeed, windowBackDist);
+
+    // Turn to realign with back wall
+    turnCenter(motorSpeed, -20);
+    driveDistance(motorSpeed, 3);
+
+    // align with back wall for levers
+    turnCenter(motorSpeed, -180);
+    bumpDriveBack(motorSpeed);
 
     // Back off wall, drive to hit button
     driveDistance(motorSpeed, 3);
