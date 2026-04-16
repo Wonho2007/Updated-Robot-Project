@@ -510,34 +510,29 @@ void driveCompost(int percent, float inches) // using encoders
 
     // If driving backwards, set negative percent
     // Set both motors to desired percent
-    if (inches > 0)
-    {
-        right_motor.SetPercent(percent);
-        left_motor.SetPercent(percent + 1);
-    }
+    
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(percent + 1);
+    
+    float startTime = TimeNow();
 
-    int oldLeftCounts = left_encoder.Counts();
-    int oldRightCounts = right_encoder.Counts();
     // While the average of the left and right encoder is less than counts,
     // keep running motors
-    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
+    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts && (TimeNow() - startTime) < 4.0)
     {
-        Sleep(0.1);
-        oldLeftCounts = left_encoder.Counts();
-        oldRightCounts = right_encoder.Counts();
-        if((left_encoder.Counts() - oldLeftCounts) < 5 || (right_encoder.Counts() - oldRightCounts) < 5)
-        {
-            right_motor.Stop();
-            left_motor.Stop();
+    }
 
-            driveDistance(percent, -3);
-            turnCenter(percent, 90);
-            driveDistance(percent, 1);
-            turnCenter(percent, -90);
+    if(TimeNow() - startTime > 4.0)
+    {
+        right_motor.Stop();
+        left_motor.Stop();
 
-            driveDistance(percent, 6);
-            break;
-        }
+        driveDistance(percent, -3);
+        turnCenter(percent, 90);
+        driveDistance(percent, 1);
+        turnCenter(percent, -90);
+
+        driveDistance(percent, 6);
     }
 
     // Turn off motors
