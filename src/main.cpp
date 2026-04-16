@@ -982,59 +982,6 @@ void ERCMain()
 
 
 
-    // Drive off wall, turn back to window
-    driveDistance(motorSpeed, 4.3);
-
-    turnCenter(motorSpeed, -91);
-    bumpDriveBackLeft(motorSpeed);
-
-    // drive forward towards window
-    driveDistance(motorSpeed, tableToWindowBackDist);
-
-    //---Drive to window---
-
-    // Turn to window.
-    LCD.Clear();
-    LCD.WriteLine("Turning");
-    turnCenter(motorSpeed, -90);
-    driveTime(motorSpeed, 1);
-
-    // Open window
-    driveDistance(windowSpeed, -windowOpenDist);
-
-
-    
-    // Turn to realign with back wall
-
-
-    /*
-    driveDistance(motorSpeed, 4);
-    turnCenter(motorSpeed, 20);
-
-    driveTime(-fastMotorSpeed, 3);
-    
-    driveDistance(motorSpeed, 1);
-
-    turnCenter(motorSpeed, 20);
-    driveDistance(motorSpeed, 3);
-    turnCenter(motorSpeed, -15);
-
-    driveDistance(motorSpeed, windowCloseDist);
-
-
-    driveDistance(motorSpeed, -3);
-    turnCenter(motorSpeed, -17);
-    */
-
-    //For no closing
-    driveDistance(motorSpeed, 3);
-    turnCenter(motorSpeed, 17);
-
-    // align with back wall for final button
-    turnCenter(motorSpeed, -180);
-    driveDistance(fastMotorSpeed, -10);
-    bumpDriveBack(motorSpeed);
-
     // Back off wall, drive to hit button
     driveDistance(motorSpeed, 3);
 
