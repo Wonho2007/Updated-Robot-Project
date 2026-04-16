@@ -933,10 +933,19 @@ void ERCMain()
     // Open window
     openWindow(windowSpeed);
 
-    // Turn to realign with back wall
-    turnCenter(motorSpeed, -20);
+    //Realign around window
     driveDistance(motorSpeed, 3);
-    turnCenter(motorSpeed, 20);
+    turnCenter(motorSpeed, 40);
+
+    driveDistance(motorSpeed, -4);
+    turnCenter(motorSpeed, -20);
+
+    //Close window
+    closeWindow(motorSpeed);
+    driveDistance(motorSpeed, -3);
+
+    // Turn to realign with back wall
+    turnCenter(motorSpeed, -10);
 
     // align with back wall for final button
     turnCenter(motorSpeed, -180);
