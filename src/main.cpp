@@ -801,7 +801,7 @@ void ERCMain()
 
     // Slightly turn and back up from tree
     turnCenter(motorSpeed, 25);
-    driveDistance(motorSpeed, -17);
+    driveDistance(motorSpeed, -17.5);
 
     // Finish turn to ramp
     turnCenter(motorSpeed, 63); // OG 65
@@ -1031,6 +1031,9 @@ void ERCMain()
     turnCenter(motorSpeed, -17);
     */
 
+    //For no closing
+    driveDistance(motorSpeed, 3);
+    turnCenter(motorSpeed, 17);
 
     // align with back wall for final button
     turnCenter(motorSpeed, -180);
