@@ -358,12 +358,12 @@ void bumpDriveFrontRight(int percent)
     left_motor.SetPercent(0);
 }
 
-void hitLeverA(int motorSpeed, int upDegrees)
+void hitLeverA(int percent, int upDegrees)
 {
     // Lower arm
     arm.SetDegree(180);
     Sleep(0.5);
-    driveDistance(motorSpeed, -4);
+    driveDistance(percent, -4);
     Sleep(4.4);
 
     arm.SetDegree(150);
@@ -372,23 +372,23 @@ void hitLeverA(int motorSpeed, int upDegrees)
     Sleep(0.1);
 
     // turn to get under lever
-    turnCenter(motorSpeed, 5);
-    driveDistance(motorSpeed, 4);
-    turnCenter(motorSpeed, -12);
+    turnCenter(percent, 5);
+    driveDistance(percent, 4);
+    turnCenter(percent, -12);
 
     arm.SetDegree(upDegrees);
     Sleep(0.1);
-    driveTime(-motorSpeed, 1);
+    driveTime(-percent, 1);
     arm.SetDegree(180);
     arm.SetDegree(50);
 }
 
-void hitLeverC(int motorSpeed, int upDegrees)
+void hitLeverC(int percent, int upDegrees)
 {
     // Lower arm
     arm.SetDegree(180);
     Sleep(0.5);
-    driveDistance(motorSpeed, -4);
+    driveDistance(percent, -4);
     Sleep(4.4);
 
     arm.SetDegree(150);
@@ -397,24 +397,24 @@ void hitLeverC(int motorSpeed, int upDegrees)
     Sleep(0.1);
 
     // turn to get under lever
-    turnCenter(motorSpeed, 5);
-    driveDistance(motorSpeed, 4);
-    turnCenter(motorSpeed, -12);
+    turnCenter(percent, 5);
+    driveDistance(percent, 4);
+    turnCenter(percent, -12);
 
     arm.SetDegree(upDegrees);
     Sleep(0.1);
-    driveTime(-motorSpeed, 1);
+    driveTime(-percent, 1);
     arm.SetDegree(180);
-    driveDistance(motorSpeed, -2);
+    driveDistance(percent, -2);
     arm.SetDegree(50);
 }
 
-void hitLeverB(int motorSpeed, int upDegrees)
+void hitLeverB(int percent, int upDegrees)
 {
     // Lower arm
     arm.SetDegree(180);
     Sleep(0.5);
-    driveDistance(motorSpeed, -4);
+    driveDistance(percent, -4);
     Sleep(4.4);
 
     arm.SetDegree(150);
@@ -423,17 +423,59 @@ void hitLeverB(int motorSpeed, int upDegrees)
     Sleep(0.1);
 
     // turn to get under lever
-    turnCenter(motorSpeed, 5);
-    driveDistance(motorSpeed, 4.5);
-    turnCenter(motorSpeed, -15);
+    turnCenter(percent, 5);
+    driveDistance(percent, 4.5);
+    turnCenter(percent, -15);
 
     arm.SetDegree(upDegrees);
     Sleep(0.1);
-    driveTime(-motorSpeed, 1);
+    driveTime(-percent, 1);
     arm.SetDegree(180);
-    turnCenter(motorSpeed, 2);
-    driveDistance(motorSpeed, -2);
+    turnCenter(percent, 2);
+    driveDistance(percent, -2);
     arm.SetDegree(50);
+}
+
+void openWindow(int percent)
+{
+    right_motor.SetPercent(-percent);
+    left_motor.SetPercent(-percent-2);
+
+    float startTime = TimeNow();
+
+    
+    while (!RCS.isWindowOpen())
+    {
+        if(TimeNow()-startTime > 5.0)
+        {
+            break;
+        }
+    }
+    
+
+    right_motor.SetPercent(0);
+    left_motor.SetPercent(0);
+}
+
+void closeWindow(int percent)
+{
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(percent+2);
+
+    float startTime = TimeNow();
+
+    /*
+    while (RCS.isWindowOpen())
+    {
+        if(TimeNow()-startTime > 3.0)
+        {
+            break;
+        }
+    }
+    */
+
+    right_motor.SetPercent(0);
+    left_motor.SetPercent(0);
 }
 
 /*------------ PID VARIABLES ----------*/
@@ -888,15 +930,15 @@ void ERCMain()
     turnCenter(motorSpeed, -90);
     driveTime(motorSpeed, 1);
 
-    // Drive to window
-    driveDistance(windowSpeed, -windowForwardDist);
-    driveDistance(windowSpeed, windowBackDist);
+    // Open window
+    openWindow(windowSpeed);
 
     // Turn to realign with back wall
     turnCenter(motorSpeed, -20);
     driveDistance(motorSpeed, 3);
+    turnCenter(motorSpeed, 20);
 
-    // align with back wall for levers
+    // align with back wall for final button
     turnCenter(motorSpeed, -180);
     bumpDriveBack(motorSpeed);
 
