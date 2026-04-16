@@ -709,10 +709,9 @@ void ERCMain()
     LCD.WriteLine("Waiting for start.");
     cdsValue = cdsCell.Value();
     boolean lightGoodTwice = false;
-    float startTime = TimeNow();
 
     
-    while (!lightGoodTwice && startTime - TimeNow() < 32)
+    while (!lightGoodTwice)
     {
         cdsValue = cdsCell.Value();
         LCD.Clear();
@@ -734,11 +733,9 @@ void ERCMain()
     LCD.Clear();
     LCD.WriteLine("Driving");
 
-    if (startTime - TimeNow() < 31)
-    {
-        driveTime(-motorSpeed, 0.3);
-        driveTime(motorSpeed, 0.3);
-    }
+    driveTime(-motorSpeed, 0.3);
+    driveTime(motorSpeed, 0.3);
+    
 
     //---Drive to compost bin---
     // Drive forward
@@ -761,12 +758,13 @@ void ERCMain()
 
     // Wait 1.5 seconds, reverse motor
     Sleep(1.25);
-    //turnCenterTime(motorSpeed, 0.1);
-    //turnCenterTime(-motorSpeed, 0.15);
-
+    turnCenterTime(motorSpeed, 0.1);
     compost.SetDegree(compostBackward);
+    turnCenterTime(-motorSpeed, 0.2);
+
+    
     // Wait 2 seconds, turn off motor
-    Sleep(1.25);
+    Sleep(1.5);
     compost.SetDegree(compostOff);
 
     //-------APPLE BUCKET---------
@@ -803,10 +801,10 @@ void ERCMain()
 
     // Slightly turn and back up from tree
     turnCenter(motorSpeed, 25);
-    driveDistance(motorSpeed, -19);
+    driveDistance(motorSpeed, -17);
 
     // Finish turn to ramp
-    turnCenter(motorSpeed, 65); // OG 75
+    turnCenter(motorSpeed, 63); // OG 65
 
     driveDistance(rampMotorSpeed, rampDistance);
 
@@ -951,7 +949,7 @@ void ERCMain()
         hitLeverA(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
-        turnCenter(motorSpeed, 27);
+        turnCenter(motorSpeed, 30);
         driveDistance(motorSpeed, -10);
         turnCenter(motorSpeed, -52);
 
@@ -1012,13 +1010,15 @@ void ERCMain()
 
     
     // Turn to realign with back wall
-    driveDistance(motorSpeed, 3);
-    turnCenter(motorSpeed, 17);
+    driveDistance(motorSpeed, 4);
+    turnCenter(motorSpeed, 20);
 
-    /*
-    bumpDriveBackRight(motorSpeed);
-    turnCenter(motorSpeed, 7);
+    driveTime(-fastMotorSpeed, 3);
+    
     driveDistance(motorSpeed, 1);
+
+    turnCenter(motorSpeed, 10);
+    driveDistance(motorSpeed, 3);
     turnCenter(motorSpeed, -5);
 
     driveDistance(motorSpeed, windowCloseDist);
@@ -1026,7 +1026,7 @@ void ERCMain()
 
     driveDistance(motorSpeed, -3);
     turnCenter(motorSpeed, -17);
-    */
+    
 
 
     // align with back wall for final button
