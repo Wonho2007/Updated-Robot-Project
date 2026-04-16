@@ -300,25 +300,6 @@ void bumpDriveBackLeft(int percent)
     left_motor.SetPercent(0);
 }
 
-void bumpDriveBackRight(int percent)
-{
-    right_motor.SetPercent(-percent);
-    left_motor.SetPercent(-percent - 2);
-    // Wait for back bumpers to get hit
-    float startTime = TimeNow();
-    while (backRightBumper.Value())
-    {
-        // break out if going backwards for 5 sec
-        if (TimeNow() - startTime > 5)
-        {
-            break;
-        }
-    }
-
-    right_motor.SetPercent(0);
-    left_motor.SetPercent(0);
-}
-
 void bumpDriveForward(int percent)
 {
     right_motor.SetPercent(percent);
@@ -383,7 +364,7 @@ void hitLeverA(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(4.2);
+    Sleep(4.4);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -408,7 +389,7 @@ void hitLeverC(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(4.2);
+    Sleep(4.4);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -434,7 +415,7 @@ void hitLeverB(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(4.2);
+    Sleep(4.4);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -469,7 +450,6 @@ void openWindow(int percent)
         {
             break;
         }
-        Sleep(0.05);
     }
     
 
@@ -499,52 +479,6 @@ void closeWindow(int percent)
     right_motor.SetPercent(0);
     left_motor.SetPercent(0);
 }
-
-void driveCompost(int percent, float inches) // using encoders
-{
-
-    float counts = countsPerInch * abs(inches);
-    // Reset encoder counts
-    right_encoder.ResetCounts();
-    left_encoder.ResetCounts();
-
-    // If driving backwards, set negative percent
-    // Set both motors to desired percent
-    if (inches > 0)
-    {
-        right_motor.SetPercent(percent);
-        left_motor.SetPercent(percent + 1);
-    }
-
-    int oldLeftCounts = left_encoder.Counts();
-    int oldRightCounts = right_encoder.Counts();
-    // While the average of the left and right encoder is less than counts,
-    // keep running motors
-    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
-    {
-        Sleep(0.1);
-        oldLeftCounts = left_encoder.Counts();
-        oldRightCounts = right_encoder.Counts();
-        if((left_encoder.Counts() - oldLeftCounts) < 5 || (right_encoder.Counts() - oldRightCounts) < 5)
-        {
-            right_motor.Stop();
-            left_motor.Stop();
-
-            driveDistance(percent, -3);
-            turnCenter(percent, 90);
-            driveDistance(percent, 1);
-            turnCenter(percent, -90);
-
-            driveDistance(percent, 6);
-            break;
-        }
-    }
-
-    // Turn off motors
-    right_motor.Stop();
-    left_motor.Stop();
-}
-
 
 /*------------ PID VARIABLES ----------*/
 const float inchesPerCount = 1 / countsPerInch;
@@ -671,8 +605,8 @@ void ERCMain()
     const float tableToWindowBackDist = 12;
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
-    const float windowOpenDist = 21;
-    const float windowCloseDist = 7;
+    const float windowForwardDist = 23;
+    const float windowBackDist = 11;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 43;        // og 50
@@ -711,7 +645,6 @@ void ERCMain()
     boolean lightGoodTwice = false;
     float startTime = TimeNow();
 
-    
     while (!lightGoodTwice && startTime - TimeNow() < 32)
     {
         cdsValue = cdsCell.Value();
@@ -728,8 +661,6 @@ void ERCMain()
         }
     }
 
-    
-
     // Drive into button.
     LCD.Clear();
     LCD.WriteLine("Driving");
@@ -742,16 +673,11 @@ void ERCMain()
 
     //---Drive to compost bin---
     // Drive forward
-    driveDistance(motorSpeed, 3.2);
-    
+    driveDistance(motorSpeed, 2.9);
 
     // Turn to face compost bin, drive forward
-    turnCenter(motorSpeed, -44);
+    turnCenter(motorSpeed, -48);
     driveDistance(motorSpeed, 15);
-
-    LCD.WriteLine("driving to compost");
-    //driveCompost(motorSpeed, 15);
-    LCD.WriteLine("done");
 
     // Turn on motor
     compost.SetDegree(compostForward);
@@ -761,9 +687,6 @@ void ERCMain()
 
     // Wait 1.5 seconds, reverse motor
     Sleep(1.25);
-    //turnCenterTime(motorSpeed, 0.1);
-    //turnCenterTime(-motorSpeed, 0.15);
-
     compost.SetDegree(compostBackward);
     // Wait 2 seconds, turn off motor
     Sleep(1.25);
@@ -781,8 +704,12 @@ void ERCMain()
 
     // Drive to back wall
     driveDistance(motorSpeed, -13);
+    // driveDistance(motorSpeed, -6);
+    // driveDistance(fastMotorSpeed, -16);
+    // bumpDriveBack(motorSpeed);
 
     // Drive to apple bucket
+    // driveDistance(motorSpeed, 15);
     turnCenter(motorSpeed, 90);
     driveDistance(motorSpeed, 6.6);
     turnCenter(motorSpeed, -90);
@@ -803,7 +730,7 @@ void ERCMain()
 
     // Slightly turn and back up from tree
     turnCenter(motorSpeed, 25);
-    driveDistance(motorSpeed, -19);
+    driveDistance(motorSpeed, -17);
 
     // Finish turn to ramp
     turnCenter(motorSpeed, 65); // OG 75
@@ -920,7 +847,7 @@ void ERCMain()
     }
 
     // Drive to back wall.
-    driveDistance(fastMotorSpeed, -10);
+    driveDistance(fastMotorSpeed, -12);
     bumpDriveBack(motorSpeed);
 
 
@@ -960,11 +887,10 @@ void ERCMain()
     else if (correctLever == 1)
     {
         // Perform actions to flip middle lever B
-        turnCenter(motorSpeed, -1);
         hitLeverB(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
-        driveDistance(motorSpeed, -9);
+        driveDistance(motorSpeed, -13);
         turnCenter(motorSpeed, -52);
 
         bumpDriveBack(motorSpeed);
@@ -1007,36 +933,31 @@ void ERCMain()
     driveTime(motorSpeed, 1);
 
     // Open window
-    driveDistance(windowSpeed, -windowOpenDist);
+    openWindow(windowSpeed);
 
-
-    
-    // Turn to realign with back wall
-    driveDistance(motorSpeed, 3);
-    turnCenter(motorSpeed, 17);
-
-    /*
-    bumpDriveBackRight(motorSpeed);
-    turnCenter(motorSpeed, 7);
-    driveDistance(motorSpeed, 1);
-    turnCenter(motorSpeed, -5);
-
-    driveDistance(motorSpeed, windowCloseDist);
-
+    //Realign around window
+    driveDistance(motorSpeed, 2);
+    turnCenter(motorSpeed, 20);
 
     driveDistance(motorSpeed, -3);
-    turnCenter(motorSpeed, -17);
-    */
+    turnCenter(motorSpeed, -25);
 
+    //Close window
+    closeWindow(windowSpeed);
+    driveDistance(motorSpeed, -3);
+
+    // Turn to realign with back wall
+    turnCenter(motorSpeed, -20);
+    driveDistance(motorSpeed, 2);
+    turnCenter(motorSpeed, 15);
 
     // align with back wall for final button
     turnCenter(motorSpeed, -180);
-    driveDistance(fastMotorSpeed, -10);
     bumpDriveBack(motorSpeed);
 
     // Back off wall, drive to hit button
     driveDistance(motorSpeed, 3);
 
-    turnCenter(motorSpeed, -92);
+    turnCenter(motorSpeed, -93);
     driveTime(fastMotorSpeed, 4);
 }
