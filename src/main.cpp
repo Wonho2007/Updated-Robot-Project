@@ -774,6 +774,9 @@ void ERCMain()
     {
         LCD.Write("TIME OUT: GOING RED");
         cdsValue = 0.20;
+        turnCenter(motorSpeed, 4);
+        driveDistance(motorSpeed, 0.4);
+        turnCenter(motorSpeed, -4);
     }
 
     // CHECK WHICH SIDE WIGGLE WORKED
