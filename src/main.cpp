@@ -1010,6 +1010,9 @@ void ERCMain()
 
     
     // Turn to realign with back wall
+
+
+    /*
     driveDistance(motorSpeed, 4);
     turnCenter(motorSpeed, 20);
 
@@ -1017,16 +1020,16 @@ void ERCMain()
     
     driveDistance(motorSpeed, 1);
 
-    turnCenter(motorSpeed, 10);
+    turnCenter(motorSpeed, 20);
     driveDistance(motorSpeed, 3);
-    turnCenter(motorSpeed, -5);
+    turnCenter(motorSpeed, -15);
 
     driveDistance(motorSpeed, windowCloseDist);
 
 
     driveDistance(motorSpeed, -3);
     turnCenter(motorSpeed, -17);
-    
+    */
 
 
     // align with back wall for final button
