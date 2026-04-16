@@ -464,15 +464,17 @@ void closeWindow(int percent)
 
     float startTime = TimeNow();
 
-    /*
+    
     while (RCS.isWindowOpen())
     {
+        /*
         if(TimeNow()-startTime > 3.0)
         {
             break;
         }
+        */
     }
-    */
+    
 
     right_motor.SetPercent(0);
     left_motor.SetPercent(0);
@@ -665,8 +667,8 @@ void ERCMain()
 
     if (startTime - TimeNow() < 31)
     {
-        driveTime(-motorSpeed, 0.5);
-        driveTime(motorSpeed, 0.5);
+        driveTime(-motorSpeed, 0.3);
+        driveTime(motorSpeed, 0.3);
     }
 
     //---Drive to compost bin---
@@ -938,14 +940,16 @@ void ERCMain()
     turnCenter(motorSpeed, 20);
 
     driveDistance(motorSpeed, -3);
-    turnCenter(motorSpeed, -20);
+    turnCenter(motorSpeed, -25);
 
     //Close window
-    closeWindow(motorSpeed);
+    closeWindow(windowSpeed);
     driveDistance(motorSpeed, -3);
 
     // Turn to realign with back wall
-    turnCenter(motorSpeed, -10);
+    turnCenter(motorSpeed, -20);
+    driveDistance(motorSpeed, 2);
+    turnCenter(motorSpeed, 15);
 
     // align with back wall for final button
     turnCenter(motorSpeed, -180);
