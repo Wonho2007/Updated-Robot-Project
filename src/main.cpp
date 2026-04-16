@@ -797,7 +797,6 @@ void ERCMain()
         driveTime(37, 1.2);
 
         driveTime(-37, 1.2);
-        turnCenter(motorSpeed, -11);
     }
 
     // Drive to back wall.
@@ -867,7 +866,7 @@ void ERCMain()
 
 
 
-    
+
 
     // Drive off wall, turn back to window
     driveDistance(motorSpeed, 4.3);
