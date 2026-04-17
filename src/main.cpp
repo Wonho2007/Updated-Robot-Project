@@ -67,13 +67,29 @@ void driveDistance(int percent, float inches) // using encoders
     // Set both motors to desired percent
     if (inches > 0)
     {
-        right_motor.SetPercent(percent);
-        left_motor.SetPercent(percent + 1);
+        if(percent >= 35)
+        {
+            right_motor.SetPercent(percent);
+            left_motor.SetPercent(percent + 2);
+        } else 
+        {
+            right_motor.SetPercent(percent);
+            left_motor.SetPercent(percent + 1);
+        }
+        
     }
     else
     {
-        right_motor.SetPercent(-percent);
-        left_motor.SetPercent(-percent - 2);
+        if(percent >= 35)
+        {
+            right_motor.SetPercent(-percent);
+            left_motor.SetPercent(-percent - 3);
+        } else 
+        {
+            right_motor.SetPercent(-percent);
+            left_motor.SetPercent(-percent - 2);
+        }
+        
     }
 
     // While the average of the left and right encoder is less than counts,
@@ -85,6 +101,7 @@ void driveDistance(int percent, float inches) // using encoders
     right_motor.Stop();
     left_motor.Stop();
 }
+
 
 // Assumes percent > 0;
 void turnCenter(int percent, int degrees) // Positive degrees turns right. Negative turns left.
