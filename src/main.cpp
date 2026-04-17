@@ -15,7 +15,7 @@ FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 FEHServo arm(FEHServo::Servo5);
 FEHServo compost(FEHServo::Servo7);
-FEHServo windowServo(FEHServo::Servo3);
+//FEHServo windowServo(FEHServo::Servo3);
 
 DigitalInputPin backLeftBumper(FEHIO::Pin7);
 DigitalInputPin backRightBumper(FEHIO::Pin0);
@@ -456,51 +456,6 @@ void hitLeverB(int percent, int upDegrees)
     arm.SetDegree(50);
 }
 
-void openWindow(int percent)
-{
-    right_motor.SetPercent(-percent);
-    left_motor.SetPercent(-percent-2);
-
-    float startTime = TimeNow();
-
-    
-    while (!RCS.isWindowOpen())
-    {
-        if(TimeNow()-startTime > 5.0)
-        {
-            break;
-        }
-        Sleep(0.05);
-    }
-    
-
-    right_motor.SetPercent(0);
-    left_motor.SetPercent(0);
-}
-
-void closeWindow(int percent)
-{
-    right_motor.SetPercent(percent);
-    left_motor.SetPercent(percent+2);
-
-    float startTime = TimeNow();
-
-    
-    while (RCS.isWindowOpen())
-    {
-        /*
-        if(TimeNow()-startTime > 3.0)
-        {
-            break;
-        }
-        */
-    }
-    
-
-    right_motor.SetPercent(0);
-    left_motor.SetPercent(0);
-}
-
 void driveCompost(int percent, float inches) // using encoders
 {
 
@@ -664,11 +619,11 @@ void ERCMain()
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
     const float rampDistance = 34.5;
-    const float tableToWindowBackDist = 12;
+    const float tableToWindowBackDist = 11.8;
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
-    const float windowOpenDist = 20;
-    const float windowCloseDist = 7;
+    const float windowOpenDist = 23;
+    const float windowCloseDist = 11;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 43;        // og 50
@@ -685,7 +640,6 @@ void ERCMain()
     int x, y; // for touch screen
 
 
-
     // Initialize the screen
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
@@ -698,9 +652,9 @@ void ERCMain()
     compost.SetMax(2500);
     compost.SetDegree(compostOff);
 
-    windowServo.SetMin(700);
-    windowServo.SetMax(2200);
-    windowServo.SetDegree(windowServoHide);
+    //windowServo.SetMin(700);
+    //windowServo.SetMax(2200);
+    //windowServo.SetDegree(windowServoHide);
 
 
 
@@ -783,14 +737,14 @@ void ERCMain()
     // Turn to left wall to align
     turnCenter(motorSpeed, -90);
     // bumpDriveForward(motorSpeed + 10);
-    driveTime(motorSpeed + 10, 1);
+    driveTime(motorSpeed + 10, 2);
 
     // Drive to back wall
     driveDistance(motorSpeed, -13);
 
     // Drive to apple bucket
-    turnCenter(motorSpeed, 90);
-    driveDistance(motorSpeed, 6.8);
+    turnCenter(motorSpeed, 92);
+    driveDistance(motorSpeed, 7.1);
     turnCenter(motorSpeed, -90);
 
     // Pick up bucket
@@ -812,7 +766,7 @@ void ERCMain()
     driveDistance(motorSpeed, -17.5);
 
     // Finish turn to ramp
-    turnCenter(motorSpeed, 63); // OG 65
+    turnCenter(motorSpeed, 65); // OG 65
 
     driveDistance(rampMotorSpeed, rampDistance);
 
@@ -992,12 +946,8 @@ void ERCMain()
 
 
 
-
-
-
     // Drive off wall, turn back to window
-    driveDistance(motorSpeed, 4.4);
-
+    driveDistance(motorSpeed, 4.3);
     turnCenter(motorSpeed, -91);
     bumpDriveBackLeft(motorSpeed);
 
@@ -1012,29 +962,19 @@ void ERCMain()
     turnCenter(motorSpeed, -90);
     driveTime(motorSpeed, 1);
 
-    // Open window
-    driveDistance(motorSpeed, -11);
-    windowServo.SetDegree(windowServoOpen);
-    driveDistance(windowSpeed, -(windowOpenDist-11));
-
-    windowServo.SetDegree(windowServoClose);
-    turnCenter(motorSpeed, 7);
-    Sleep(0.2);
-
+    // Drive to window
+    driveDistance(windowSpeed, -windowOpenDist);
     driveDistance(windowSpeed, windowCloseDist);
-    windowServo.SetDegree(windowServoHide);
-    
+
     // Turn to realign with back wall
-
-
-    //For no closing
-    turnCenter(motorSpeed, -10);
+    turnCenter(motorSpeed, -20);
     driveDistance(motorSpeed, 3);
 
-    // align with back wall for final button
+    // align with back wall for levers
     turnCenter(motorSpeed, -180);
-    driveDistance(fastMotorSpeed, -10);
     bumpDriveBack(motorSpeed);
+
+
 
     // Back off wall, drive to hit button
     driveDistance(motorSpeed, 3);

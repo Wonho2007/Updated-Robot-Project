@@ -664,7 +664,7 @@ void ERCMain()
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
     const float rampDistance = 34.5;
-    const float tableToWindowBackDist = 12.1;
+    const float tableToWindowBackDist = 12;
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
     const float windowOpenDist = 20;
@@ -1013,35 +1013,17 @@ void ERCMain()
 
 
 
-   
-
-
     // Open window
-    driveDistance(motorSpeed, -11);
     windowServo.SetDegree(windowServoOpen);
-    Sleep(0.5);
-    driveDistance(windowSpeed, -(windowOpenDist-11));
+    driveDistance(windowSpeed, -windowOpenDist);
 
-    windowServo.SetDegree(windowServoClose);
-    turnCenter(motorSpeed, 7);
-    Sleep(0.2);
-
-    driveDistance(windowSpeed, windowCloseDist);
-    
-    
-    // Turn to realign with back wall
-
-
-    //Realign with back wall
-    driveDistance(motorSpeed, -3);
-    windowServo.SetDegree(windowServoHide);
-    turnCenter(motorSpeed, -10);
-    
+    driveDistance(motorSpeed, 3);
+    turnCenter(motorSpeed, 17);
 
     // align with back wall for final button
     turnCenter(motorSpeed, -180);
+    driveDistance(fastMotorSpeed, -10);
     bumpDriveBack(motorSpeed);
-
     // Back off wall, drive to hit button
     driveDistance(motorSpeed, 3);
 
