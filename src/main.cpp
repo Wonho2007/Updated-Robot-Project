@@ -15,6 +15,7 @@ FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 FEHServo arm(FEHServo::Servo5);
 FEHServo compost(FEHServo::Servo7);
+FEHServo windowServo(FEHServo::Servo3);
 
 DigitalInputPin backLeftBumper(FEHIO::Pin7);
 DigitalInputPin backRightBumper(FEHIO::Pin0);
@@ -666,7 +667,7 @@ void ERCMain()
     const float tableToWindowBackDist = 12;
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
-    const float windowOpenDist = 21;
+    const float windowOpenDist = 20;
     const float windowCloseDist = 7;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
@@ -677,7 +678,13 @@ void ERCMain()
     const int compostForward = 0;
     const int compostBackward = 180;
 
+    const int windowServoClose = 145;
+    const int windowServoOpen = 66;
+    const int windowServoHide = 20;
+
     int x, y; // for touch screen
+
+
 
     // Initialize the screen
     LCD.Clear(BLACK);
@@ -690,6 +697,12 @@ void ERCMain()
     compost.SetMin(500);
     compost.SetMax(2500);
     compost.SetDegree(compostOff);
+
+    windowServo.SetMin(700);
+    windowServo.SetMax(2200);
+    windowServo.SetDegree(windowServoHide);
+
+
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
@@ -777,7 +790,7 @@ void ERCMain()
 
     // Drive to apple bucket
     turnCenter(motorSpeed, 90);
-    driveDistance(motorSpeed, 6.6);
+    driveDistance(motorSpeed, 6.8);
     turnCenter(motorSpeed, -90);
 
     // Pick up bucket
@@ -981,6 +994,47 @@ void ERCMain()
 
 
 
+
+    // Drive off wall, turn back to window
+    driveDistance(motorSpeed, 4.4);
+
+    turnCenter(motorSpeed, -91);
+    bumpDriveBackLeft(motorSpeed);
+
+    // drive forward towards window
+    driveDistance(motorSpeed, tableToWindowBackDist);
+
+    //---Drive to window---
+
+    // Turn to window.
+    LCD.Clear();
+    LCD.WriteLine("Turning");
+    turnCenter(motorSpeed, -90);
+    driveTime(motorSpeed, 1);
+
+    // Open window
+    driveDistance(motorSpeed, -11);
+    windowServo.SetDegree(windowServoOpen);
+    driveDistance(windowSpeed, -(windowOpenDist-11));
+
+    windowServo.SetDegree(windowServoClose);
+    turnCenter(motorSpeed, 7);
+    Sleep(0.2);
+
+    driveDistance(windowSpeed, windowCloseDist);
+    windowServo.SetDegree(windowServoHide);
+    
+    // Turn to realign with back wall
+
+
+    //For no closing
+    turnCenter(motorSpeed, -10);
+    driveDistance(motorSpeed, 3);
+
+    // align with back wall for final button
+    turnCenter(motorSpeed, -180);
+    driveDistance(fastMotorSpeed, -10);
+    bumpDriveBack(motorSpeed);
 
     // Back off wall, drive to hit button
     driveDistance(motorSpeed, 3);
