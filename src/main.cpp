@@ -20,7 +20,7 @@ FEHServo windowServo(FEHServo::Servo3);
 
 DigitalInputPin backLeftBumper(FEHIO::Pin7);
 DigitalInputPin backRightBumper(FEHIO::Pin0);
-DigitalInputPin frontLeftBumper(FEHIO::Pin6);
+DigitalInputPin frontLeftBumper(FEHIO::Pin5);
 DigitalInputPin frontRightBumper(FEHIO::Pin2);
 
 const float countsPerInch = (318 / (PI * 3));
@@ -349,7 +349,7 @@ void bumpDriveForward(int percent)
             right_motor.SetPercent(0);
         }
 
-        // If either lever is down, wait 5 seconds before breaking out
+        // If either bump is down, wait 5 seconds before breaking out
         if (!frontLeftBumper.Value() || !frontRightBumper.Value())
         {
             if (TimeNow() - startTime > 5)
@@ -388,13 +388,32 @@ void bumpDriveFrontRight(int percent)
     left_motor.SetPercent(0);
 }
 
+void bumpDriveFrontLeft(int percent)
+{
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(percent + 2);
+    // Wait for front left bumper to get hit
+    float startTime = TimeNow();
+    while (frontLeftBumper.Value())
+    {
+        // break out if going backwards for 3 sec
+        if (TimeNow() - startTime > 3)
+        {
+            break;
+        }
+    }
+
+    right_motor.SetPercent(0);
+    left_motor.SetPercent(0);
+}
+
 void hitLeverA(int percent, int upDegrees)
 {
     // Lower arm
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(4.0);
+    Sleep(3.5);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -419,7 +438,7 @@ void hitLeverC(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(4.0);
+    Sleep(3.5);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -445,7 +464,7 @@ void hitLeverB(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(4.0);
+    Sleep(3.5);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -539,15 +558,16 @@ void ERCMain()
 {
     const int slowMotorSpeed = 20; // Input power level here
     const int motorSpeed = 25;
+    const int midMotorSpeed = 35;
     const int windowSpeed = 35;
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
-    const float rampDistance = 34.5;
+    const float rampDistance = 32;
     const float tableToWindowBackDist = 11.8;
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
     const float windowOpenDist = 21;
-    const float windowCloseDist = 8;
+    const float windowCloseDist = 8.5;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 43;        // og 50
@@ -629,9 +649,7 @@ void ERCMain()
     
 
     // Turn to face compost bin, drive forward
-    turnCenter(motorSpeed, -44);
-    //driveDistance(motorSpeed, 15);
-    
+    turnCenter(motorSpeed, -44);    
 
     LCD.WriteLine("driving to compost");
     driveCompost(motorSpeed, 15);
@@ -644,14 +662,14 @@ void ERCMain()
     turnCenterTime(-motorSpeed, 0.7);
 
     // Wait 1.5 seconds, reverse motor
-    Sleep(1.25);
+    Sleep(0.9);
     turnCenterTime(motorSpeed, 0.1);
     compost.SetDegree(compostBackward);
     turnCenterTime(-motorSpeed, 0.2);
 
     
     // Wait 2 seconds, turn off motor
-    Sleep(1.5);
+    Sleep(1.4);
     compost.SetDegree(compostOff);
 
     //-------APPLE BUCKET---------
@@ -661,15 +679,15 @@ void ERCMain()
 
     // Turn to left wall to align
     turnCenter(motorSpeed, -90);
-    // bumpDriveForward(motorSpeed + 10);
-    driveTime(motorSpeed + 10, 2);
+    bumpDriveForward(motorSpeed);
+    //driveTime(motorSpeed + 10, 2);
 
     // Drive back
     driveDistance(motorSpeed, -13);
 
     // Drive to apple bucket
     turnCenter(motorSpeed, 92);
-    driveDistance(motorSpeed, 7.5);
+    driveDistance(motorSpeed, 7.3);
     turnCenter(motorSpeed, -90);
 
     // Pick up bucket
@@ -707,7 +725,7 @@ void ERCMain()
     // Turn to table
 
     turnCenter(motorSpeed, 98);
-    // bumpDriveFrontRight(motorSpeed);
+    //bumpDriveForward(motorSpeed);
     driveTime(motorSpeed, 1);
 
     // Back up from table, drop off bucket
@@ -811,7 +829,7 @@ void ERCMain()
 
     //---Drive to window---
     // Drive off wall, turn back to window
-    driveDistance(motorSpeed, 6);
+    driveDistance(motorSpeed, 6.8);
     turnCenter(motorSpeed, -91);
     bumpDriveBackLeft(motorSpeed);
 
@@ -824,11 +842,13 @@ void ERCMain()
     LCD.Clear();
     LCD.WriteLine("Turning");
     turnCenter(motorSpeed, -90);
-    driveTime(motorSpeed, 1);
+    //driveTime(motorSpeed, 1);
+    bumpDriveForward(motorSpeed);
 
     // Drive to window, open servo, open window
     driveDistance(motorSpeed, -11);
     windowServo.SetDegree(windowServoOpen);
+    turnCenter(motorSpeed, -2);
     windowDrive(windowSpeed, -(windowOpenDist-11), 'o');
 
     windowServo.SetDegree(windowServoClose);
@@ -844,16 +864,19 @@ void ERCMain()
     turnCenter(motorSpeed, -20);
 
     // align with back wall for levers
-    turnCenter(motorSpeed, -180);
-    bumpDriveBack(motorSpeed);
+    //turnCenter(motorSpeed, -180);
+    driveDistance(fastMotorSpeed, 10);
+    bumpDriveForward(motorSpeed);
 
 
 
     // align with table
     //  Drive off wall, drive into table
-    driveDistance(motorSpeed, 4.3);
-    turnCenter(motorSpeed, 91);
-    driveTime(motorSpeed, 1.5);
+    driveDistance(motorSpeed, -0.1);
+    turnCenter(motorSpeed, -91);
+    //driveTime(motorSpeed, 1.5);
+    bumpDriveFrontLeft(motorSpeed);
+
     // back off table
     driveDistance(motorSpeed, -tableToLeverBack);
     // Turn to face levers, drive to levers
