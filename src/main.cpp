@@ -6,6 +6,7 @@
 #include <FEHRCS.h>
 #include <FEHSD.h>
 #include <FEHRCS.h>
+#include <math.h>
 
 // Declarations for encoders & motors
 AnalogInputPin cdsCell(FEHIO::Pin12);
@@ -15,7 +16,7 @@ FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 FEHServo arm(FEHServo::Servo5);
 FEHServo compost(FEHServo::Servo7);
-//FEHServo windowServo(FEHServo::Servo3);
+FEHServo windowServo(FEHServo::Servo3);
 
 DigitalInputPin backLeftBumper(FEHIO::Pin7);
 DigitalInputPin backRightBumper(FEHIO::Pin0);
@@ -32,14 +33,17 @@ void driveTime(int percent, float seconds) // using encoders
 
     if (percent > 0)
     {
-        // Forward
-        right_motor.SetPercent(percent);
-        left_motor.SetPercent(percent + 1);
+        int adjustedPercentForward = percent + ceil(percent * 0.04);
+        right_motor.SetPercent(adjustedPercentForward);
+        left_motor.SetPercent(adjustedPercentForward);
+        
+        
     }
     else
     {
-        right_motor.SetPercent(percent);
-        left_motor.SetPercent(percent - 2);
+        int adjustedPercentForward = percent + ceil(percent * 0.08);
+        right_motor.SetPercent(adjustedPercentForward);
+        left_motor.SetPercent(adjustedPercentForward);
     }
 
     // While the timer is less than seconds,
@@ -67,28 +71,17 @@ void driveDistance(int percent, float inches) // using encoders
     // Set both motors to desired percent
     if (inches > 0)
     {
-        if(percent >= 35)
-        {
-            right_motor.SetPercent(percent);
-            left_motor.SetPercent(percent + 2);
-        } else 
-        {
-            right_motor.SetPercent(percent);
-            left_motor.SetPercent(percent + 1);
-        }
+        int adjustedPercentForward = percent + ceil(percent * 0.04);
+        right_motor.SetPercent(adjustedPercentForward);
+        left_motor.SetPercent(adjustedPercentForward);
+        
         
     }
     else
     {
-        if(percent >= 35)
-        {
-            right_motor.SetPercent(-percent);
-            left_motor.SetPercent(-percent - 3);
-        } else 
-        {
-            right_motor.SetPercent(-percent);
-            left_motor.SetPercent(-percent - 2);
-        }
+        int adjustedPercentForward = percent + ceil(percent * 0.08);
+        right_motor.SetPercent(-adjustedPercentForward);
+        left_motor.SetPercent(-adjustedPercentForward);
         
     }
 
@@ -401,7 +394,7 @@ void hitLeverA(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(4.2);
+    Sleep(4.0);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -426,7 +419,7 @@ void hitLeverC(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(4.2);
+    Sleep(4.0);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -452,7 +445,7 @@ void hitLeverB(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(4.2);
+    Sleep(4.0);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -481,9 +474,7 @@ void driveCompost(int percent, float inches) // using encoders
     right_encoder.ResetCounts();
     left_encoder.ResetCounts();
 
-    // If driving backwards, set negative percent
     // Set both motors to desired percent
-    
     right_motor.SetPercent(percent);
     left_motor.SetPercent(percent + 1);
     
@@ -495,7 +486,8 @@ void driveCompost(int percent, float inches) // using encoders
     {
     }
 
-    if(TimeNow() - startTime > 4.0)
+    //If the robot did not reach the distance in 4 seconds, turn right and go forward
+    if(TimeNow() - startTime >= 4.0)
     {
         right_motor.Stop();
         left_motor.Stop();
@@ -513,119 +505,32 @@ void driveCompost(int percent, float inches) // using encoders
     left_motor.Stop();
 }
 
-
-/*------------ PID VARIABLES ----------*/
-const float inchesPerCount = 1 / countsPerInch;
-float pastTimeLeft = 0;
-float pastTimeRight = 0;
-float changeInTime = 0;
-
-float pastErrorLeft = 0;
-float errorLeft = 0;
-float errorSumLeft = 0;
-
-float pastErrorRight = 0;
-float errorRight = 0;
-float errorSumRight = 0;
-
-float pastLeftCounts = 0;
-float pastRightCounts = 0;
-float changeInLeftCounts = 0;
-float changeInRightCounts = 0;
-float actualVelocity;
-
-float PTerm = 0;
-float ITerm = 0;
-float DTerm = 0;
-float PConstant = 1.0;
-float IConstant = 0.02;
-float Dconstant = 0.25;
-float oldMotorSpeed = 50;
-
-void resetPIDVar()
+void windowDrive(int percent, float inches, char openOrClose)
 {
-    pastTimeLeft = 0;
-    pastTimeRight = 0;
-    changeInTime = 0;
-
-    pastErrorLeft = 0;
-    errorLeft = 0;
-    errorSumLeft = 0;
-
-    pastErrorRight = 0;
-    errorRight = 0;
-    errorSumRight = 0;
-
-    pastLeftCounts = 0;
-    pastRightCounts = 0;
-    changeInLeftCounts = 0;
-    changeInRightCounts = 0;
-    actualVelocity;
-
-    PTerm = 0;
-    ITerm = 0;
-    DTerm = 0;
-    PConstant = 0.75;
-    IConstant = 0.7;
-    Dconstant = 0.25;
-    oldMotorSpeed = 25;
-    left_encoder.ResetCounts();
+    float counts = countsPerInch * abs(inches);
+    // Reset encoder counts
     right_encoder.ResetCounts();
+    left_encoder.ResetCounts();
 
-    pastTimeLeft = TimeNow();
-    pastTimeRight = TimeNow();
-
-    Sleep(0.1);
-}
-
-float LeftMotorPIDAdjustment(float expectedVelocity)
-{
-    changeInLeftCounts = left_encoder.Counts() - pastLeftCounts;
-    changeInTime = TimeNow() - pastTimeLeft;
-    actualVelocity = inchesPerCount * (changeInLeftCounts / changeInTime);
-    errorLeft = expectedVelocity - actualVelocity;
-    errorSumLeft += errorLeft;
-
-    PTerm = errorLeft * PConstant;
-    ITerm = errorSumLeft * IConstant;
-    DTerm = (errorLeft - pastErrorLeft) * Dconstant;
-    pastErrorLeft = errorLeft;
-    pastLeftCounts = left_encoder.Counts();
-    pastTimeLeft = TimeNow();
-
-    return (oldMotorSpeed + PTerm + ITerm + DTerm);
-}
-
-float RightMotorPIDAdjustment(float expectedVelocity)
-{
-    changeInRightCounts = right_encoder.Counts() - pastRightCounts;
-    changeInTime = TimeNow() - pastTimeRight;
-    actualVelocity = inchesPerCount * (changeInRightCounts / changeInTime);
-    errorRight = expectedVelocity - actualVelocity;
-    errorSumRight += errorRight;
-
-    PTerm = errorRight * PConstant;
-    ITerm = errorSumRight * IConstant;
-    DTerm = (errorRight - pastErrorRight) * Dconstant;
-    pastErrorRight = errorRight;
-    pastRightCounts = right_encoder.Counts();
-    pastTimeRight = TimeNow();
-
-    return (oldMotorSpeed + PTerm + ITerm + DTerm);
-}
-
-void driveDistancePID(float expectedVelocity, float distance)
-{
-    resetPIDVar();
-    while (left_encoder.Counts() * inchesPerCount < distance && right_encoder.Counts() * inchesPerCount < distance)
+    if(openOrClose == 'o')
     {
-        left_motor.SetPercent(LeftMotorPIDAdjustment(expectedVelocity));
-        right_motor.SetPercent(RightMotorPIDAdjustment(expectedVelocity));
-        Sleep(0.05);
+        right_motor.SetPercent(-percent);
+        left_motor.SetPercent(-percent-5);
+    } else
+    {
+        right_motor.SetPercent(percent);
+        left_motor.SetPercent(percent+5);
     }
+        
+    
+    // While the average of the left and right encoder is less than counts,
+    // keep running motors
+    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
+        ;
 
-    left_motor.SetPercent(0);
-    right_motor.SetPercent(0);
+    // Turn off motors
+    right_motor.Stop();
+    left_motor.Stop();   
 }
 
 void ERCMain()
@@ -639,8 +544,8 @@ void ERCMain()
     const float tableToWindowBackDist = 11.8;
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
-    const float windowOpenDist = 23;
-    const float windowCloseDist = 11;
+    const float windowOpenDist = 20;
+    const float windowCloseDist = 7;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 43;        // og 50
@@ -669,9 +574,9 @@ void ERCMain()
     compost.SetMax(2500);
     compost.SetDegree(compostOff);
 
-    //windowServo.SetMin(700);
-    //windowServo.SetMax(2200);
-    //windowServo.SetDegree(windowServoHide);
+    windowServo.SetMin(700);
+    windowServo.SetMax(2200);
+    windowServo.SetDegree(windowServoHide);
 
 
 
@@ -718,15 +623,16 @@ void ERCMain()
 
     //---Drive to compost bin---
     // Drive forward
-    driveDistance(motorSpeed, 3.2);
+    driveDistance(fastMotorSpeed, 3.3);
     
 
     // Turn to face compost bin, drive forward
     turnCenter(motorSpeed, -44);
-    driveDistance(motorSpeed, 15);
+    //driveDistance(motorSpeed, 15);
+    
 
     LCD.WriteLine("driving to compost");
-    //driveCompost(motorSpeed, 15);
+    driveCompost(motorSpeed, 15);
     LCD.WriteLine("done");
 
     // Turn on motor
@@ -756,12 +662,12 @@ void ERCMain()
     // bumpDriveForward(motorSpeed + 10);
     driveTime(motorSpeed + 10, 2);
 
-    // Drive to back wall
-    driveDistance(motorSpeed, -13);
+    // Drive back
+    driveDistance(fastMotorSpeed, -13);
 
     // Drive to apple bucket
     turnCenter(motorSpeed, 92);
-    driveDistance(motorSpeed, 7.1);
+    driveDistance(motorSpeed, 7.3);
     turnCenter(motorSpeed, -90);
 
     // Pick up bucket
@@ -787,7 +693,7 @@ void ERCMain()
 
     driveDistance(rampMotorSpeed, rampDistance);
 
-    turnCenter(motorSpeed, -100);
+    turnCenter(fastMotorSpeed, -95);
 
     // Align with back wall
 
@@ -798,9 +704,9 @@ void ERCMain()
 
     // Turn to table
 
-    turnCenter(motorSpeed, 98);
+    turnCenter(fastMotorSpeed, 98);
     // bumpDriveFrontRight(motorSpeed);
-    driveTime(motorSpeed, 2);
+    driveTime(motorSpeed, 1);
 
     // Back up from table, drop off bucket
     arm.SetDegree(appleUpDegrees + 40);
@@ -908,13 +814,14 @@ void ERCMain()
     // align with table
     //  Drive off wall, drive into table
     driveDistance(motorSpeed, 4.3);
-    turnCenter(motorSpeed, 91);
-    driveTime(motorSpeed, 3);
+    turnCenter(fastMotorSpeed, 91);
+    driveTime(motorSpeed, 1.5);
     // back off table
     driveDistance(motorSpeed, -tableToLeverBack);
     // Turn to face levers, drive to levers
     turnCenter(motorSpeed, -38);
-    driveDistance(motorSpeed, 15.5);
+    //driveDistance(motorSpeed, 15.5);
+    driveDistance(fastMotorSpeed, 15);
 
     // Get correct lever from the RCS
     int correctLever = RCS.GetLever();
@@ -929,7 +836,7 @@ void ERCMain()
 
         // Turn back and align with wall for button
         turnCenter(motorSpeed, 30);
-        driveDistance(motorSpeed, -10);
+        driveDistance(fastMotorSpeed, -10);
         turnCenter(motorSpeed, -52);
 
         bumpDriveBack(motorSpeed);
@@ -941,7 +848,7 @@ void ERCMain()
         hitLeverB(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
-        driveDistance(motorSpeed, -9);
+        driveDistance(fastMotorSpeed, -9);
         turnCenter(motorSpeed, -52);
 
         bumpDriveBack(motorSpeed);
@@ -955,7 +862,7 @@ void ERCMain()
 
         // Turn back and align with wall for button
         turnCenter(motorSpeed, -10);
-        driveDistance(motorSpeed, -8);
+        driveDistance(fastMotorSpeed, -8);
         turnCenter(motorSpeed, -52);
 
         bumpDriveBack(motorSpeed);
@@ -965,7 +872,7 @@ void ERCMain()
 
     // Drive off wall, turn back to window
     driveDistance(motorSpeed, 4.3);
-    turnCenter(motorSpeed, -91);
+    turnCenter(fastMotorSpeed, -91);
     bumpDriveBackLeft(motorSpeed);
 
     // drive forward towards window
@@ -979,13 +886,21 @@ void ERCMain()
     turnCenter(motorSpeed, -90);
     driveTime(motorSpeed, 1);
 
-    // Drive to window
-    driveDistance(windowSpeed, -windowOpenDist);
-    driveDistance(windowSpeed, windowCloseDist);
+    // Drive to window, open servo, open window
+    driveDistance(motorSpeed, -11);
+    windowServo.SetDegree(windowServoOpen);
+    windowDrive(windowSpeed, -(windowOpenDist-11), 'o');
+
+    windowServo.SetDegree(windowServoClose);
+    turnCenter(motorSpeed, 7);
+    Sleep(0.2);
+
+    windowDrive(windowSpeed, windowCloseDist, 'c');
+    windowServo.SetDegree(windowServoHide);
 
     // Turn to realign with back wall
+    driveDistance(fastMotorSpeed, -3);
     turnCenter(motorSpeed, -20);
-    driveDistance(motorSpeed, 3);
 
     // align with back wall for levers
     turnCenter(motorSpeed, -180);
@@ -994,8 +909,8 @@ void ERCMain()
 
 
     // Back off wall, drive to hit button
-    driveDistance(motorSpeed, 3);
+    driveDistance(fastMotorSpeed, 3);
 
-    turnCenter(motorSpeed, -92);
+    turnCenter(fastMotorSpeed, -92);
     driveTime(fastMotorSpeed, 4);
 }
