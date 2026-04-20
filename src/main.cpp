@@ -827,56 +827,15 @@ void ERCMain()
 
 
 
-    //---Drive to window---
-    // Drive off wall, turn back to window
-    driveDistance(motorSpeed, 6.8);
-    turnCenter(motorSpeed, -91);
-    bumpDriveBackLeft(motorSpeed);
-
-    // drive forward towards window
-    driveDistance(motorSpeed, tableToWindowBackDist);
-
-  
-
-    // Turn to window.
-    LCD.Clear();
-    LCD.WriteLine("Turning");
-    turnCenter(motorSpeed, -90);
-    //driveTime(motorSpeed, 1);
-    bumpDriveForward(motorSpeed);
-
-    // Drive to window, open servo, open window
-    driveDistance(motorSpeed, -11);
-    windowServo.SetDegree(windowServoOpen);
-    turnCenter(motorSpeed, -2);
-    windowDrive(windowSpeed, -(windowOpenDist-11), 'o');
-
-    windowServo.SetDegree(windowServoClose);
-    turnCenter(motorSpeed, 7);
-    Sleep(0.2);
-
-    windowDrive(windowSpeed, windowCloseDist, 'c');
     
-
-    // Turn to realign with back wall
-    driveDistance(fastMotorSpeed, -3);
-    windowServo.SetDegree(windowServoHide);
-    turnCenter(motorSpeed, -20);
-
-    // align with back wall for levers
-    //turnCenter(motorSpeed, -180);
-    driveDistance(fastMotorSpeed, 10);
-    bumpDriveForward(motorSpeed);
 
 
 
     // align with table
     //  Drive off wall, drive into table
-    driveDistance(motorSpeed, -0.1);
-    turnCenter(motorSpeed, -91);
-    //driveTime(motorSpeed, 1.5);
-    bumpDriveFrontLeft(motorSpeed);
-
+    driveDistance(motorSpeed, 4.3);
+    turnCenter(motorSpeed, 91);
+    driveTime(motorSpeed, 3);
     // back off table
     driveDistance(motorSpeed, -tableToLeverBack);
     // Turn to face levers, drive to levers
@@ -933,12 +892,51 @@ void ERCMain()
     
 
 
+    //---Drive to window---
+    // Drive off wall, turn back to window
+    driveDistance(motorSpeed, 6.8);
+    turnCenter(motorSpeed, -91);
+    bumpDriveBackLeft(motorSpeed);
+
+    // drive forward towards window
+    driveDistance(motorSpeed, tableToWindowBackDist);
+
+    // Turn to window.
+    LCD.Clear();
+    LCD.WriteLine("Turning");
+    turnCenter(motorSpeed, -90);
+    //driveTime(motorSpeed, 1);
+    bumpDriveForward(motorSpeed);
+
+    // Drive to window, open servo, open window
+    driveDistance(motorSpeed, -11);
+    windowServo.SetDegree(windowServoOpen);
+    turnCenter(motorSpeed, -2);
+    windowDrive(windowSpeed, -(windowOpenDist-11), 'o');
+
+    windowServo.SetDegree(windowServoClose);
+    turnCenter(motorSpeed, 7);
+    Sleep(0.2);
+
+    windowDrive(windowSpeed, windowCloseDist, 'c');
+    
+
+    // Turn to realign with back wall
+    driveDistance(fastMotorSpeed, -3);
+    windowServo.SetDegree(windowServoHide);
+    turnCenter(motorSpeed, -20);
+
+    // align with back wall for levers
+    //turnCenter(motorSpeed, -180);
+    driveDistance(fastMotorSpeed, 10);
+    bumpDriveForward(motorSpeed);
+
 
     
 
     // Back off wall, drive to hit button
-    driveDistance(motorSpeed, 3);
+    driveDistance(motorSpeed, -1);
 
-    turnCenter(motorSpeed, -92);
+    turnCenter(motorSpeed, 92);
     driveTime(fastMotorSpeed, 4);
 }
