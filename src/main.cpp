@@ -572,7 +572,6 @@ void ERCMain()
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
     const float rampDistance = 32;
-    const float tableToWindowBackDist = 11.8;
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
     const float windowOpenDist = 21;
@@ -588,7 +587,7 @@ void ERCMain()
 
     const int windowServoClose = 145;
     const int windowServoOpen = 66;
-    const int windowServoHide = 20;
+    const int windowServoHide = 9;
 
     int x, y; // for touch screen
 
@@ -617,13 +616,14 @@ void ERCMain()
 
 
 
-
-
-
-
     RCS.InitializeTouchMenu("0910B8VYV");
 
     WaitForFinalAction();
+    char courseLetter = RCS.CurrentRegionLetter();
+
+
+
+
 
     // Wait for cds cell to read start light
 
@@ -661,7 +661,55 @@ void ERCMain()
 
     //---Drive to compost bin---
     // Drive forward
-    driveDistance(motorSpeed, 3.3);
+    float compostForwardDistance = 3.5;
+    float tableToWindowBackDist = 11.7;
+    float appleBucketDistance = 7.2;
+
+    switch (courseLetter)
+    {
+    case 'A':
+        compostForwardDistance = 3.5;
+        appleBucketDistance = 7.2;
+        tableToWindowBackDist = 11.7;
+        break;
+    case 'B':
+        compostForwardDistance = 3.5;
+        appleBucketDistance = 7.2;
+        tableToWindowBackDist = 11.7;
+        break;
+    case 'C':
+        compostForwardDistance = 3.5;
+        appleBucketDistance = 7.2;
+        tableToWindowBackDist = 11.7;
+        break;
+    case 'D':
+        compostForwardDistance = 3.5;
+        appleBucketDistance = 7.2;
+        tableToWindowBackDist = 11.7;
+        break;
+    case 'E':
+        compostForwardDistance = 3.5;
+        appleBucketDistance = 7.2;
+        tableToWindowBackDist = 11.7;
+        break;
+    case 'F':
+        compostForwardDistance = 3.5;
+        appleBucketDistance = 7.2;
+        tableToWindowBackDist = 11.7;
+        break;
+    case 'G':
+        compostForwardDistance = 3.5;
+        appleBucketDistance = 7.2;
+        tableToWindowBackDist = 11.7;
+        break;
+    case 'H':
+        compostForwardDistance = 3.5;
+        appleBucketDistance = 7.2;
+        tableToWindowBackDist = 11.7;
+        break;
+    }
+
+    driveDistance(motorSpeed, compostForwardDistance);
     
 
     // Turn to face compost bin, drive forward
@@ -703,7 +751,7 @@ void ERCMain()
 
     // Drive to apple bucket
     turnCenter(motorSpeed, 92);
-    driveDistance(motorSpeed, 7.2);
+    driveDistance(motorSpeed, appleBucketDistance);
     turnCenter(motorSpeed, -90);
 
     // Pick up bucket
@@ -725,7 +773,7 @@ void ERCMain()
     driveDistance(motorSpeed, -17.5);
 
     // Finish turn to ramp
-    turnCenter(motorSpeed, 64); // OG 65
+    turnCenter(motorSpeed, 63); // OG 65
 
     driveDistance(rampMotorSpeed, rampDistance);
 
@@ -906,6 +954,10 @@ void ERCMain()
 
 
     
+
+
+
+
 
 
     //---Drive to window---
