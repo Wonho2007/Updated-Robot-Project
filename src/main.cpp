@@ -342,12 +342,21 @@ void bumpDriveForward(int percent)
         if (!frontLeftBumper.Value())
         {
             left_motor.SetPercent(0);
+        } else
+        {
+            left_motor.SetPercent(percent+2);
         }
 
         if (!frontRightBumper.Value())
         {
             right_motor.SetPercent(0);
+        } else
+        {
+            right_motor.SetPercent(percent);
+
         }
+
+        
 
         // If either bump is down, wait 5 seconds before breaking out
         if (!frontLeftBumper.Value() || !frontRightBumper.Value())
@@ -454,7 +463,7 @@ void hitLeverC(int percent, int upDegrees)
     Sleep(0.1);
     driveTime(-percent, 1);
     arm.SetDegree(180);
-    driveDistance(percent, -2);
+    driveDistance(percent+20, -2);
     arm.SetDegree(50);
 }
 
@@ -481,7 +490,7 @@ void hitLeverB(int percent, int upDegrees)
     driveTime(-percent, 1);
     arm.SetDegree(180);
     turnCenter(percent, 2);
-    driveDistance(percent, -2);
+    driveDistance(percent+20, -2);
     arm.SetDegree(50);
 }
 
@@ -558,7 +567,7 @@ void ERCMain()
 {
     const int slowMotorSpeed = 20; // Input power level here
     const int motorSpeed = 25;
-    const int midMotorSpeed = 35;
+    const int midMotorSpeed = 50;
     const int windowSpeed = 35;
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
@@ -604,6 +613,13 @@ void ERCMain()
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
+
+
+
+
+
+
+
 
     RCS.InitializeTouchMenu("0910B8VYV");
 
@@ -679,7 +695,7 @@ void ERCMain()
 
     // Turn to left wall to align
     turnCenter(motorSpeed, -90);
-    bumpDriveForward(motorSpeed);
+    bumpDriveForward(midMotorSpeed);
     //driveTime(motorSpeed + 10, 2);
 
     // Drive back
@@ -687,7 +703,7 @@ void ERCMain()
 
     // Drive to apple bucket
     turnCenter(motorSpeed, 92);
-    driveDistance(motorSpeed, 7.3);
+    driveDistance(motorSpeed, 7.2);
     turnCenter(motorSpeed, -90);
 
     // Pick up bucket
@@ -709,7 +725,7 @@ void ERCMain()
     driveDistance(motorSpeed, -17.5);
 
     // Finish turn to ramp
-    turnCenter(motorSpeed, 65); // OG 65
+    turnCenter(motorSpeed, 64); // OG 65
 
     driveDistance(rampMotorSpeed, rampDistance);
 
@@ -835,7 +851,7 @@ void ERCMain()
     //  Drive off wall, drive into table
     driveDistance(motorSpeed, 4.3);
     turnCenter(motorSpeed, 91);
-    driveTime(motorSpeed, 3);
+    driveTime(motorSpeed, 2);
     // back off table
     driveDistance(motorSpeed, -tableToLeverBack);
     // Turn to face levers, drive to levers
@@ -881,7 +897,7 @@ void ERCMain()
 
         // Turn back and align with wall for button
         turnCenter(motorSpeed, -10);
-        driveDistance(fastMotorSpeed, -8);
+        driveDistance(fastMotorSpeed, -5);
         turnCenter(motorSpeed, -52);
 
         bumpDriveBack(motorSpeed);
@@ -924,12 +940,12 @@ void ERCMain()
     // Turn to realign with back wall
     driveDistance(fastMotorSpeed, -3);
     windowServo.SetDegree(windowServoHide);
-    turnCenter(motorSpeed, -20);
+    turnCenter(motorSpeed, -30);
 
     // align with back wall for levers
     //turnCenter(motorSpeed, -180);
     driveDistance(fastMotorSpeed, 10);
-    bumpDriveForward(motorSpeed);
+    bumpDriveForward(fastMotorSpeed);
 
 
     
@@ -937,6 +953,6 @@ void ERCMain()
     // Back off wall, drive to hit button
     driveDistance(motorSpeed, -1);
 
-    turnCenter(motorSpeed, 92);
+    turnCenter(motorSpeed, 91);
     driveTime(fastMotorSpeed, 4);
 }
