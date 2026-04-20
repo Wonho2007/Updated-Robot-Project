@@ -482,7 +482,7 @@ void driveCompost(int percent, float inches) // using encoders
 
     // While the average of the left and right encoder is less than counts,
     // keep running motors
-    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts && (TimeNow() - startTime) < 4.0)
+    while ((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts && (TimeNow() - startTime) < 5.0)
     {
     }
 
@@ -623,7 +623,7 @@ void ERCMain()
 
     //---Drive to compost bin---
     // Drive forward
-    driveDistance(fastMotorSpeed, 3.3);
+    driveDistance(motorSpeed, 3.3);
     
 
     // Turn to face compost bin, drive forward
@@ -663,7 +663,7 @@ void ERCMain()
     driveTime(motorSpeed + 10, 2);
 
     // Drive back
-    driveDistance(fastMotorSpeed, -13);
+    driveDistance(motorSpeed, -13);
 
     // Drive to apple bucket
     turnCenter(motorSpeed, 92);
@@ -693,7 +693,7 @@ void ERCMain()
 
     driveDistance(rampMotorSpeed, rampDistance);
 
-    turnCenter(fastMotorSpeed, -95);
+    turnCenter(motorSpeed, -95);
 
     // Align with back wall
 
@@ -704,7 +704,7 @@ void ERCMain()
 
     // Turn to table
 
-    turnCenter(fastMotorSpeed, 98);
+    turnCenter(motorSpeed, 98);
     // bumpDriveFrontRight(motorSpeed);
     driveTime(motorSpeed, 1);
 
@@ -728,6 +728,63 @@ void ERCMain()
     turnCenter(motorSpeed, -90);
     bumpDriveBack(motorSpeed);
 
+
+
+
+    //---Drive to window---
+    // Drive off wall, turn back to window
+    driveDistance(motorSpeed, 5);
+    turnCenter(motorSpeed, -91);
+    bumpDriveBackLeft(motorSpeed);
+
+    // drive forward towards window
+    driveDistance(motorSpeed, tableToWindowBackDist);
+
+  
+
+    // Turn to window.
+    LCD.Clear();
+    LCD.WriteLine("Turning");
+    turnCenter(motorSpeed, -90);
+    driveTime(motorSpeed, 1);
+
+    // Drive to window, open servo, open window
+    driveDistance(motorSpeed, -11);
+    windowServo.SetDegree(windowServoOpen);
+    windowDrive(windowSpeed, -(windowOpenDist-11), 'o');
+
+    windowServo.SetDegree(windowServoClose);
+    turnCenter(motorSpeed, 7);
+    Sleep(0.2);
+
+    windowDrive(windowSpeed, windowCloseDist, 'c');
+    windowServo.SetDegree(windowServoHide);
+
+    // Turn to realign with back wall
+    driveDistance(fastMotorSpeed, -3);
+    turnCenter(motorSpeed, -20);
+
+    // align with back wall for levers
+    turnCenter(motorSpeed, -180);
+    bumpDriveBack(motorSpeed);
+
+
+
+
+
+
+
+    driveDistance(motorSpeed, 4.3);
+    turnCenter(motorSpeed, 90);
+    driveTime(motorSpeed, 2);
+    // Back up from table, drive to humidifier
+    driveDistance(motorSpeed, -tableToHumidifierBack);
+
+    // Turn to humidifier.
+    LCD.Clear();
+    LCD.WriteLine("Turning");
+    turnCenter(motorSpeed, -90);
+    bumpDriveBack(motorSpeed);
     // Drive to humidifier light
     driveDistance(motorSpeed, 18);
 
@@ -814,14 +871,13 @@ void ERCMain()
     // align with table
     //  Drive off wall, drive into table
     driveDistance(motorSpeed, 4.3);
-    turnCenter(fastMotorSpeed, 91);
+    turnCenter(motorSpeed, 91);
     driveTime(motorSpeed, 1.5);
     // back off table
     driveDistance(motorSpeed, -tableToLeverBack);
     // Turn to face levers, drive to levers
     turnCenter(motorSpeed, -38);
-    //driveDistance(motorSpeed, 15.5);
-    driveDistance(fastMotorSpeed, 15);
+    driveDistance(motorSpeed, 15.5);
 
     // Get correct lever from the RCS
     int correctLever = RCS.GetLever();
@@ -870,47 +926,15 @@ void ERCMain()
 
 
 
-    // Drive off wall, turn back to window
-    driveDistance(motorSpeed, 4.3);
-    turnCenter(fastMotorSpeed, -91);
-    bumpDriveBackLeft(motorSpeed);
-
-    // drive forward towards window
-    driveDistance(motorSpeed, tableToWindowBackDist);
-
-    //---Drive to window---
-
-    // Turn to window.
-    LCD.Clear();
-    LCD.WriteLine("Turning");
-    turnCenter(motorSpeed, -90);
-    driveTime(motorSpeed, 1);
-
-    // Drive to window, open servo, open window
-    driveDistance(motorSpeed, -11);
-    windowServo.SetDegree(windowServoOpen);
-    windowDrive(windowSpeed, -(windowOpenDist-11), 'o');
-
-    windowServo.SetDegree(windowServoClose);
-    turnCenter(motorSpeed, 7);
-    Sleep(0.2);
-
-    windowDrive(windowSpeed, windowCloseDist, 'c');
-    windowServo.SetDegree(windowServoHide);
-
-    // Turn to realign with back wall
-    driveDistance(fastMotorSpeed, -3);
-    turnCenter(motorSpeed, -20);
-
-    // align with back wall for levers
-    turnCenter(motorSpeed, -180);
-    bumpDriveBack(motorSpeed);
+    
 
 
+
+    
 
     // Back off wall, drive to hit button
     driveDistance(fastMotorSpeed, 3);
 
-    turnCenter(fastMotorSpeed, -92);
+    turnCenter(motorSpeed, -92);
     driveTime(fastMotorSpeed, 4);
 }
