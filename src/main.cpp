@@ -433,12 +433,12 @@ void hitLeverA(int percent, int upDegrees)
     // turn to get under lever
     turnCenter(percent, 5);
     driveDistance(percent, 4);
-    turnCenter(percent, -12);
+    turnCenter(percent, -15);
 
     arm.SetDegree(upDegrees);
     Sleep(0.1);
     turnCenter(25, 10);
-    driveTime(-percent-20, 1);
+    driveTime(-percent-20, 0.5);
     arm.SetDegree(180);
     arm.SetDegree(50);
 }
@@ -578,7 +578,7 @@ void ERCMain()
     const float rampDistance = 32;
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
-    const float windowOpenDist = 22;
+    const float windowOpenDist = 10;
     const float windowCloseDist = 9.5;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
@@ -616,6 +616,65 @@ void ERCMain()
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
+
+
+
+
+
+
+/*
+    while (true)
+    {
+        LCD.Clear();
+        LCD.Write("Touch to forward 15 inches");
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+        //driveDistancePID(7, 15);
+        driveDistance(turnMotorSpeed, 15);
+
+        LCD.Clear();
+        LCD.Write("Touch to go again");
+
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+
+        LCD.WriteLine("Going");
+        //driveDistancePID(7, 15);
+        driveDistance(turnMotorSpeed, 15);
+
+        Sleep(2.0);
+
+        
+        
+        LCD.Clear();
+        LCD.Write("Touch to forward 15 inches (faster)");
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+        //driveDistancePID(7, 15);
+        driveDistance(motorSpeed, 15);
+
+        LCD.Clear();
+        LCD.Write("Touch to go again (faster)");
+
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+
+        LCD.WriteLine("Going");
+        //driveDistancePID(7, 15);
+        driveDistance(motorSpeed, 15);
+
+        Sleep(2.0);
+    }
+
+
+*/
+
+
+
 
 
 
@@ -917,13 +976,13 @@ void ERCMain()
     if (correctLever == 0)
     {
         // Perform actions to flip left lever A
-        turnCenter(turnMotorSpeed, -20);
+        turnCenter(turnMotorSpeed, -21);
         driveDistance(motorSpeed, 2);
         hitLeverA(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
         turnCenter(turnMotorSpeed, 32);
-        driveDistance(fastMotorSpeed, -8);
+        driveDistance(fastMotorSpeed, -7);
         turnCenter(turnMotorSpeed, -52);
 
         bumpDriveBack(midMotorSpeed);
@@ -986,7 +1045,7 @@ void ERCMain()
     driveDistance(motorSpeed, -13);
     windowServo.SetDegree(windowServoOpen);
     //turnCenter(motorSpeed, -2);
-    windowDrive(windowSpeed, -(windowOpenDist-11), 'o');
+    windowDrive(windowSpeed, -windowOpenDist, 'o');
 
     windowServo.SetDegree(windowServoClose);
     turnAboutWheel(motorSpeed, 10, 'R');
