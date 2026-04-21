@@ -568,6 +568,7 @@ void windowDrive(int percent, float inches, char openOrClose)
 
 void ERCMain()
 {
+    const int turnMotorSpeed = 25;
     const int slowMotorSpeed = 20; // Input power level here
     const int motorSpeed = 25;
     const int midMotorSpeed = 50;
@@ -716,7 +717,7 @@ void ERCMain()
     
 
     // Turn to face compost bin, drive forward
-    turnCenter(motorSpeed, -44);    
+    turnCenter(turnMotorSpeed, -44);    
 
     LCD.WriteLine("driving to compost");
     driveCompost(motorSpeed, 15);
@@ -726,13 +727,13 @@ void ERCMain()
     compost.SetDegree(compostForward);
 
     // Turn wheel into compost bin
-    turnCenterTime(-motorSpeed, 0.7);
+    turnCenterTime(-turnMotorSpeed, 0.7);
 
     // Wait 1.5 seconds, reverse motor
     Sleep(0.7);
-    turnCenterTime(motorSpeed, 0.1);
+    turnCenterTime(turnMotorSpeed, 0.1);
     compost.SetDegree(compostBackward);
-    turnCenterTime(-motorSpeed, 0.2);
+    turnCenterTime(-turnMotorSpeed, 0.2);
 
     
     // Wait, turn off motor
@@ -741,11 +742,11 @@ void ERCMain()
 
     //-------APPLE BUCKET---------
     // Turn to apple stump and go forward slightly
-    turnCenter(motorSpeed, 23 + 90);
+    turnCenter(turnMotorSpeed, 23 + 90);
     driveDistance(motorSpeed, 2.5); // OG 2
 
     // Turn to left wall to align
-    turnCenter(motorSpeed, -90);
+    turnCenter(turnMotorSpeed, -90);
     bumpDriveForward(midMotorSpeed);
     //driveTime(motorSpeed + 10, 2);
 
@@ -753,9 +754,9 @@ void ERCMain()
     driveDistance(motorSpeed, -13);
 
     // Drive to apple bucket
-    turnCenter(motorSpeed, 92);
+    turnCenter(turnMotorSpeed, 92);
     driveDistance(motorSpeed, appleBucketDistance);
-    turnCenter(motorSpeed, -90);
+    turnCenter(turnMotorSpeed, -90);
 
     // Pick up bucket
     arm.SetDegree(parallelDegrees);
@@ -772,15 +773,15 @@ void ERCMain()
     Sleep(0.4);
 
     // Slightly turn and back up from tree
-    turnCenter(motorSpeed, 25);
+    turnCenter(turnMotorSpeed, 25);
     driveDistance(motorSpeed, -16.5);
 
     // Finish turn to ramp
-    turnCenter(motorSpeed, rampAngle); // OG 65
+    turnCenter(turnMotorSpeed, rampAngle); // OG 65
 
     driveDistance(rampMotorSpeed, rampDistance);
 
-    turnCenter(motorSpeed, -115);
+    turnCenter(turnMotorSpeed, -115);
 
     // Align with back wall
 
@@ -791,7 +792,7 @@ void ERCMain()
 
     // Turn to table
 
-    turnCenter(motorSpeed, 98);
+    turnCenter(turnMotorSpeed, 98);
     bumpDriveForward(motorSpeed);
     //driveTime(motorSpeed, 1);
 
@@ -813,7 +814,7 @@ void ERCMain()
     // Turn to humidifier.
     LCD.Clear();
     LCD.WriteLine("Turning");
-    turnCenter(motorSpeed, -90);
+    turnCenter(turnMotorSpeed, -90);
     bumpDriveBack(motorSpeed);
 
     driveDistance(motorSpeed, 18);
@@ -842,18 +843,18 @@ void ERCMain()
         if (cdsValue > leftCdsValue)
         {
             cdsValue = leftCdsValue;
-            turnCenter(motorSpeed, -2);
+            turnCenter(turnMotorSpeed, -2);
             driveDistance(motorSpeed, 0.4);
-            turnCenter(motorSpeed, 2);
+            turnCenter(turnMotorSpeed, 2);
         }
 
         // If to the left of the light
         if (cdsValue > rightCdsValue)
         {
             cdsValue = rightCdsValue;
-            turnCenter(motorSpeed, 2);
+            turnCenter(turnMotorSpeed, 2);
             driveDistance(motorSpeed, 0.4);
-            turnCenter(motorSpeed, -2);
+            turnCenter(turnMotorSpeed, -2);
         }
     }
 
@@ -861,9 +862,9 @@ void ERCMain()
     {
         LCD.Write("TIME OUT: GOING RED");
         cdsValue = 0.20;
-        turnCenter(motorSpeed, 4);
+        turnCenter(turnMotorSpeed, 4);
         driveDistance(motorSpeed, 0.4);
-        turnCenter(motorSpeed, -4);
+        turnCenter(turnMotorSpeed, -4);
     }
 
     // CHECK WHICH SIDE WIGGLE WORKED
@@ -873,17 +874,17 @@ void ERCMain()
     {
         // LCD.Clear(BLUE);
         LCD.WriteLine("Blue");
-        turnCenter(motorSpeed, -11);
+        turnCenter(turnMotorSpeed, -11);
         driveTime(37, 1);
 
         driveDistance(motorSpeed, -1);
-        turnCenter(motorSpeed, 11);
+        turnCenter(turnMotorSpeed, 11);
     }
     else // Red
     {
         // LCD.Clear(RED);
         LCD.WriteLine("Red");
-        turnCenter(motorSpeed, 11);
+        turnCenter(turnMotorSpeed, 11);
         driveTime(37, 1.2);
         driveTime(-37, 1.2);
     }
@@ -901,12 +902,12 @@ void ERCMain()
     // align with table
     //  Drive off wall, drive into table
     driveDistance(motorSpeed, 4.3);
-    turnCenter(motorSpeed, 91);
+    turnCenter(turnMotorSpeed, 91);
     driveTime(motorSpeed, 2);
     // back off table
     driveDistance(motorSpeed, -tableToLeverBack);
     // Turn to face levers, drive to levers
-    turnCenter(motorSpeed, -38);
+    turnCenter(turnMotorSpeed, -38);
     driveDistance(motorSpeed, 15.5);
 
     // Get correct lever from the RCS
@@ -916,40 +917,40 @@ void ERCMain()
     if (correctLever == 0)
     {
         // Perform actions to flip left lever A
-        turnCenter(motorSpeed, -20);
+        turnCenter(turnMotorSpeed, -20);
         driveDistance(motorSpeed, 2);
         hitLeverA(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
-        turnCenter(motorSpeed, 32);
+        turnCenter(turnMotorSpeed, 32);
         driveDistance(fastMotorSpeed, -8);
-        turnCenter(motorSpeed, -52);
+        turnCenter(turnMotorSpeed, -52);
 
         bumpDriveBack(midMotorSpeed);
     }
     else if (correctLever == 1)
     {
         // Perform actions to flip middle lever B
-        turnCenter(motorSpeed, -3);
+        turnCenter(turnMotorSpeed, -3);
         hitLeverB(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
         driveDistance(fastMotorSpeed, -9);
-        turnCenter(motorSpeed, -52);
+        turnCenter(turnMotorSpeed, -52);
 
         bumpDriveBack(midMotorSpeed);
     }
     else if (correctLever == 2)
     {
         // Perform actions to flip right lever C
-        turnCenter(motorSpeed, 10);
+        turnCenter(turnMotorSpeed, 10);
         driveDistance(motorSpeed, 1);
         hitLeverC(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
-        turnCenter(motorSpeed, -8);
+        turnCenter(turnMotorSpeed, -8);
         driveDistance(fastMotorSpeed, -5);
-        turnCenter(motorSpeed, -52);
+        turnCenter(turnMotorSpeed, -52);
 
         bumpDriveBack(midMotorSpeed);
     }
