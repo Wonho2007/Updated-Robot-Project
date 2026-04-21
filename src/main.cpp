@@ -95,7 +95,6 @@ void driveDistance(int percent, float inches) // using encoders
     left_motor.Stop();
 }
 
-
 // Assumes percent > 0;
 void turnCenter(int percent, int degrees) // Positive degrees turns right. Negative turns left.
 
@@ -438,12 +437,12 @@ void hitLeverA(int percent, int upDegrees)
 
     arm.SetDegree(upDegrees);
     Sleep(0.1);
-    driveTime(-percent, 1);
+    driveTime(-percent-20, 1);
     arm.SetDegree(180);
     arm.SetDegree(50);
 }
 
-void hitLeverC(int percent, int upDegrees)
+void hitLeverB(int percent, int upDegrees)
 {
     // Lower arm
     arm.SetDegree(180);
@@ -458,18 +457,19 @@ void hitLeverC(int percent, int upDegrees)
 
     // turn to get under lever
     turnCenter(percent, 5);
-    driveDistance(percent, 4);
-    turnCenter(percent, -12);
+    driveDistance(percent, 4.5);
+    turnCenter(percent, -15);
 
     arm.SetDegree(upDegrees);
     Sleep(0.1);
     driveTime(-percent, 1);
     arm.SetDegree(180);
+    turnCenter(percent, 2);
     driveDistance(percent+20, -2);
     arm.SetDegree(50);
 }
 
-void hitLeverB(int percent, int upDegrees)
+void hitLeverC(int percent, int upDegrees)
 {
     // Lower arm
     arm.SetDegree(180);
@@ -665,55 +665,46 @@ void ERCMain()
     float compostForwardDistance = 3.5;
     float tableToWindowBackDist = 11.7;
     float appleBucketDistance = 7.2;
+    float rampAngle = 63;
 
     switch (courseLetter)
     {
     case 'A':
-        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         tableToWindowBackDist = 11.7;
         break;
     case 'B':
-        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         tableToWindowBackDist = 11.7;
         break;
     case 'C':
-        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         tableToWindowBackDist = 11.7;
         break;
     case 'D':
-        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         tableToWindowBackDist = 11.7;
         break;
     case 'E':
-        arm.SetDegree(parallelDegrees);
-        Sleep(1.0);
-        arm.SetDegree(upDegrees);
         compostForwardDistance = 4.3;
         appleBucketDistance = 6.5;
         tableToWindowBackDist = 11.9;
         break;
     case 'F':
-        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         tableToWindowBackDist = 11.7;
         break;
     case 'G':
-        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.6;
         appleBucketDistance = 7.0;
         tableToWindowBackDist = 11.7;
         break;
     case 'H':
-        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         tableToWindowBackDist = 11.6;
@@ -737,13 +728,13 @@ void ERCMain()
     turnCenterTime(-motorSpeed, 0.7);
 
     // Wait 1.5 seconds, reverse motor
-    Sleep(0.9);
+    Sleep(0.7);
     turnCenterTime(motorSpeed, 0.1);
     compost.SetDegree(compostBackward);
     turnCenterTime(-motorSpeed, 0.2);
 
     
-    // Wait 2 seconds, turn off motor
+    // Wait, turn off motor
     Sleep(1.4);
     compost.SetDegree(compostOff);
 
@@ -784,7 +775,7 @@ void ERCMain()
     driveDistance(motorSpeed, -16.5);
 
     // Finish turn to ramp
-    turnCenter(motorSpeed, 63); // OG 65
+    turnCenter(motorSpeed, rampAngle); // OG 65
 
     driveDistance(rampMotorSpeed, rampDistance);
 
@@ -883,7 +874,7 @@ void ERCMain()
         turnCenter(motorSpeed, -11);
         driveTime(37, 1);
 
-        driveTime(-37, 1);
+        driveDistance(motorSpeed, -1);
         turnCenter(motorSpeed, 11);
     }
     else // Red
@@ -893,11 +884,11 @@ void ERCMain()
         turnCenter(motorSpeed, 11);
         driveTime(37, 1.2);
 
-        driveTime(-37, 1.2);
+        //driveTime(-37, 1.2);
     }
 
     // Drive to back wall.
-    driveDistance(fastMotorSpeed, -10);
+    driveDistance(fastMotorSpeed, -16);
     bumpDriveBack(motorSpeed);
 
 
@@ -929,11 +920,11 @@ void ERCMain()
         hitLeverA(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
-        turnCenter(motorSpeed, 30);
-        driveDistance(fastMotorSpeed, -10);
+        turnCenter(motorSpeed, 32);
+        driveDistance(fastMotorSpeed, -8);
         turnCenter(motorSpeed, -52);
 
-        bumpDriveBack(motorSpeed);
+        bumpDriveBack(midMotorSpeed);
     }
     else if (correctLever == 1)
     {
@@ -945,21 +936,21 @@ void ERCMain()
         driveDistance(fastMotorSpeed, -9);
         turnCenter(motorSpeed, -52);
 
-        bumpDriveBack(motorSpeed);
+        bumpDriveBack(midMotorSpeed);
     }
     else if (correctLever == 2)
     {
         // Perform actions to flip right lever C
         turnCenter(motorSpeed, 10);
         driveDistance(motorSpeed, 1);
-        hitLeverB(motorSpeed, parallelDegrees);
+        hitLeverC(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
         turnCenter(motorSpeed, -8);
         driveDistance(fastMotorSpeed, -5);
         turnCenter(motorSpeed, -52);
 
-        bumpDriveBack(motorSpeed);
+        bumpDriveBack(midMotorSpeed);
     }
 
 
@@ -999,7 +990,7 @@ void ERCMain()
     Sleep(0.2);
 
     windowDrive(windowSpeed, windowCloseDist, 'c');
-    Sleep(0.2);
+    Sleep(0.1);
 
     // Turn to realign with back wall
     driveDistance(fastMotorSpeed, -3);
