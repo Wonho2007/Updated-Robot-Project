@@ -433,10 +433,11 @@ void hitLeverA(int percent, int upDegrees)
     // turn to get under lever
     turnCenter(percent, 5);
     driveDistance(percent, 4);
-    turnCenter(percent, -7);
+    turnCenter(percent, -12);
 
     arm.SetDegree(upDegrees);
     Sleep(0.1);
+    turnCenter(25, 10);
     driveTime(-percent-20, 1);
     arm.SetDegree(180);
     arm.SetDegree(50);
@@ -485,7 +486,7 @@ void hitLeverC(int percent, int upDegrees)
     // turn to get under lever
     turnCenter(percent, 5);
     driveDistance(percent, 4.5);
-    turnCenter(percent, -15);
+    turnCenter(percent, -10);
 
     arm.SetDegree(upDegrees);
     Sleep(0.1);
@@ -545,7 +546,7 @@ void windowDrive(int percent, float inches, char openOrClose)
     if(openOrClose == 'o')
     {
         //Opening Backwards
-        right_motor.SetPercent(-percent-7);
+        right_motor.SetPercent(-percent-16);
         left_motor.SetPercent(-percent);
     } else
     {
@@ -576,7 +577,7 @@ void ERCMain()
     const float rampDistance = 32;
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
-    const float windowOpenDist = 21;
+    const float windowOpenDist = 22;
     const float windowCloseDist = 9.5;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
@@ -706,7 +707,7 @@ void ERCMain()
         break;
     case 'H':
         compostForwardDistance = 3.5;
-        appleBucketDistance = 7.2;
+        appleBucketDistance = 7.1;
         tableToWindowBackDist = 11.6;
         break;
     }
@@ -791,8 +792,8 @@ void ERCMain()
     // Turn to table
 
     turnCenter(motorSpeed, 98);
-    //bumpDriveForward(motorSpeed);
-    driveTime(motorSpeed, 1);
+    bumpDriveForward(motorSpeed);
+    //driveTime(motorSpeed, 1);
 
     // Back up from table, drop off bucket
     arm.SetDegree(appleUpDegrees + 40);
@@ -803,7 +804,8 @@ void ERCMain()
     Sleep(0.2);
     arm.SetDegree(upDegrees);
     Sleep(0.2);
-    driveTime(motorSpeed, 1.5);
+    //driveTime(motorSpeed, 1.5);
+    bumpDriveForward(motorSpeed);
 
     // Back up from table, drive to humidifier
     driveDistance(motorSpeed, -tableToHumidifierBack);
@@ -883,12 +885,11 @@ void ERCMain()
         LCD.WriteLine("Red");
         turnCenter(motorSpeed, 11);
         driveTime(37, 1.2);
-
-        //driveTime(-37, 1.2);
+        driveTime(-37, 1.2);
     }
 
     // Drive to back wall.
-    driveDistance(fastMotorSpeed, -16);
+    driveDistance(fastMotorSpeed, -12);
     bumpDriveBack(motorSpeed);
 
 
@@ -915,7 +916,7 @@ void ERCMain()
     if (correctLever == 0)
     {
         // Perform actions to flip left lever A
-        turnCenter(motorSpeed, -24);
+        turnCenter(motorSpeed, -20);
         driveDistance(motorSpeed, 2);
         hitLeverA(motorSpeed, parallelDegrees);
 
@@ -977,12 +978,14 @@ void ERCMain()
     turnCenter(motorSpeed, -90);
     //driveTime(motorSpeed, 1);
     bumpDriveForward(motorSpeed);
+    driveTime(fastMotorSpeed, 0.5);
+    Sleep(0.1);
 
     // Drive to window, open servo, open window
     driveDistance(motorSpeed, -13);
     windowServo.SetDegree(windowServoOpen);
     //turnCenter(motorSpeed, -2);
-    windowDrive(windowSpeed, -(windowOpenDist-12), 'o');
+    windowDrive(windowSpeed, -(windowOpenDist-11), 'o');
 
     windowServo.SetDegree(windowServoClose);
     turnAboutWheel(motorSpeed, 10, 'R');
@@ -990,10 +993,11 @@ void ERCMain()
     Sleep(0.2);
 
     windowDrive(windowSpeed, windowCloseDist, 'c');
-    Sleep(0.1);
+    Sleep(0.3);
 
     // Turn to realign with back wall
-    driveDistance(fastMotorSpeed, -3);
+    driveDistance(motorSpeed, -1);
+    driveDistance(fastMotorSpeed, -2);
     windowServo.SetDegree(windowServoHide);
     turnCenter(motorSpeed, -30);
 
