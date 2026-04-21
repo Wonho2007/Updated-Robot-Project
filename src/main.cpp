@@ -577,7 +577,7 @@ void ERCMain()
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
     const float windowOpenDist = 21;
-    const float windowCloseDist = 9;
+    const float windowCloseDist = 9.5;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 43;        // og 50
@@ -955,7 +955,7 @@ void ERCMain()
         hitLeverB(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
-        turnCenter(motorSpeed, -10);
+        turnCenter(motorSpeed, -8);
         driveDistance(fastMotorSpeed, -5);
         turnCenter(motorSpeed, -52);
 
@@ -999,7 +999,7 @@ void ERCMain()
     Sleep(0.2);
 
     windowDrive(windowSpeed, windowCloseDist, 'c');
-    
+    Sleep(0.2);
 
     // Turn to realign with back wall
     driveDistance(fastMotorSpeed, -3);
@@ -1017,6 +1017,6 @@ void ERCMain()
     // Back off wall, drive to hit button
     driveDistance(motorSpeed, -1);
 
-    turnCenter(motorSpeed, 89);
+    turnCenter(motorSpeed, 87);
     driveTime(fastMotorSpeed, 4);
 }
