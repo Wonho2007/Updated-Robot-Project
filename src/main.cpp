@@ -342,6 +342,7 @@ void bumpDriveForward(int percent)
         if (!frontLeftBumper.Value())
         {
             left_motor.SetPercent(0);
+            right_motor.SetPercent(percent+20);
         } else
         {
             left_motor.SetPercent(percent+2);
@@ -350,6 +351,7 @@ void bumpDriveForward(int percent)
         if (!frontRightBumper.Value())
         {
             right_motor.SetPercent(0);
+            left_motor.SetPercent(percent+20);
         } else
         {
             right_motor.SetPercent(percent);
@@ -422,7 +424,7 @@ void hitLeverA(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(3.5);
+    Sleep(3.0);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -432,7 +434,7 @@ void hitLeverA(int percent, int upDegrees)
     // turn to get under lever
     turnCenter(percent, 5);
     driveDistance(percent, 4);
-    turnCenter(percent, -12);
+    turnCenter(percent, -7);
 
     arm.SetDegree(upDegrees);
     Sleep(0.1);
@@ -447,7 +449,7 @@ void hitLeverC(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(3.5);
+    Sleep(3.0);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -473,7 +475,7 @@ void hitLeverB(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(3.5);
+    Sleep(3.0);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -543,12 +545,12 @@ void windowDrive(int percent, float inches, char openOrClose)
     if(openOrClose == 'o')
     {
         //Opening Backwards
-        right_motor.SetPercent(-percent-5);
+        right_motor.SetPercent(-percent-7);
         left_motor.SetPercent(-percent);
     } else
     {
         //Closing Forwards
-        right_motor.SetPercent(percent+5);
+        right_motor.SetPercent(percent+7);
         left_motor.SetPercent(percent);
     }
         
@@ -575,7 +577,7 @@ void ERCMain()
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
     const float windowOpenDist = 21;
-    const float windowCloseDist = 8.5;
+    const float windowCloseDist = 9;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
     const float upDegrees = 43;        // og 50
@@ -636,8 +638,6 @@ void ERCMain()
     while (!lightGoodTwice)
     {
         cdsValue = cdsCell.Value();
-        LCD.Clear();
-        LCD.WriteLine(cdsValue);
         if (cdsValue < cdsRedHighThresh)
         {
             Sleep(0.1);
@@ -654,6 +654,7 @@ void ERCMain()
     // Drive into button.
     LCD.Clear();
     LCD.WriteLine("Driving");
+    LCD.WriteLine(courseLetter);
 
     driveTime(-motorSpeed, 0.3);
     driveTime(motorSpeed, 0.3);
@@ -668,44 +669,54 @@ void ERCMain()
     switch (courseLetter)
     {
     case 'A':
+        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         tableToWindowBackDist = 11.7;
         break;
     case 'B':
+        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         tableToWindowBackDist = 11.7;
         break;
     case 'C':
+        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         tableToWindowBackDist = 11.7;
         break;
     case 'D':
+        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         tableToWindowBackDist = 11.7;
         break;
     case 'E':
-        compostForwardDistance = 3.5;
-        appleBucketDistance = 7.2;
-        tableToWindowBackDist = 11.7;
+        arm.SetDegree(parallelDegrees);
+        Sleep(1.0);
+        arm.SetDegree(upDegrees);
+        compostForwardDistance = 4.3;
+        appleBucketDistance = 6.5;
+        tableToWindowBackDist = 11.9;
         break;
     case 'F':
+        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         tableToWindowBackDist = 11.7;
         break;
     case 'G':
-        compostForwardDistance = 3.5;
-        appleBucketDistance = 7.2;
+        LCD.WriteLine("case " + courseLetter);
+        compostForwardDistance = 3.6;
+        appleBucketDistance = 7.0;
         tableToWindowBackDist = 11.7;
         break;
     case 'H':
+        LCD.WriteLine("case " + courseLetter);
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
-        tableToWindowBackDist = 11.7;
+        tableToWindowBackDist = 11.6;
         break;
     }
 
@@ -770,14 +781,14 @@ void ERCMain()
 
     // Slightly turn and back up from tree
     turnCenter(motorSpeed, 25);
-    driveDistance(motorSpeed, -17.5);
+    driveDistance(motorSpeed, -16.5);
 
     // Finish turn to ramp
     turnCenter(motorSpeed, 63); // OG 65
 
     driveDistance(rampMotorSpeed, rampDistance);
 
-    turnCenter(motorSpeed, -105);
+    turnCenter(motorSpeed, -115);
 
     // Align with back wall
 
@@ -913,7 +924,7 @@ void ERCMain()
     if (correctLever == 0)
     {
         // Perform actions to flip left lever A
-        turnCenter(motorSpeed, -26);
+        turnCenter(motorSpeed, -24);
         driveDistance(motorSpeed, 2);
         hitLeverA(motorSpeed, parallelDegrees);
 
@@ -962,12 +973,12 @@ void ERCMain()
 
     //---Drive to window---
     // Drive off wall, turn back to window
-    driveDistance(motorSpeed, 6.8);
+    driveDistance(motorSpeed, 6.9);
     turnCenter(motorSpeed, -91);
     bumpDriveBackLeft(motorSpeed);
 
     // drive forward towards window
-    driveDistance(motorSpeed, tableToWindowBackDist);
+    driveDistance(slowMotorSpeed, tableToWindowBackDist);
 
     // Turn to window.
     LCD.Clear();
@@ -977,12 +988,13 @@ void ERCMain()
     bumpDriveForward(motorSpeed);
 
     // Drive to window, open servo, open window
-    driveDistance(motorSpeed, -11);
+    driveDistance(motorSpeed, -13);
     windowServo.SetDegree(windowServoOpen);
-    turnCenter(motorSpeed, -2);
-    windowDrive(windowSpeed, -(windowOpenDist-11), 'o');
+    //turnCenter(motorSpeed, -2);
+    windowDrive(windowSpeed, -(windowOpenDist-12), 'o');
 
     windowServo.SetDegree(windowServoClose);
+    turnAboutWheel(motorSpeed, 10, 'R');
     turnCenter(motorSpeed, 7);
     Sleep(0.2);
 
@@ -1005,6 +1017,6 @@ void ERCMain()
     // Back off wall, drive to hit button
     driveDistance(motorSpeed, -1);
 
-    turnCenter(motorSpeed, 91);
+    turnCenter(motorSpeed, 89);
     driveTime(fastMotorSpeed, 4);
 }
