@@ -1,0 +1,46 @@
+while (true)
+    {
+        LCD.Clear();
+        LCD.Write("Touch to forward 15 inches");
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+        //driveDistancePID(7, 15);
+        driveDistance(turnMotorSpeed, 15);
+
+        LCD.Clear();
+        LCD.Write("Touch to go again");
+
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+
+        LCD.WriteLine("Going");
+        //driveDistancePID(7, 15);
+        driveDistance(turnMotorSpeed, 15);
+
+        Sleep(2.0);
+
+        
+        
+        LCD.Clear();
+        LCD.Write("Touch to forward 15 inches (faster)");
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+        //driveDistancePID(7, 15);
+        driveDistance(motorSpeed, 15);
+
+        LCD.Clear();
+        LCD.Write("Touch to go again (faster)");
+
+        while (!LCD.Touch(&x, &y))
+        {
+        }
+
+        LCD.WriteLine("Going");
+        //driveDistancePID(7, 15);
+        driveDistance(motorSpeed, 15);
+
+        Sleep(2.0);
+    }

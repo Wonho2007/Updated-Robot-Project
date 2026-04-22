@@ -578,7 +578,6 @@ void ERCMain()
     const float rampDistance = 32;
     const float tableToLeverBack = 7;
     const float tableToHumidifierBack = 1.25;
-    const float windowOpenDist = 10;
     const float windowCloseDist = 9.5;
     const float cdsRedHighThresh = 0.55;
     const float cdsBlueHighThresh = 1.2;
@@ -616,66 +615,6 @@ void ERCMain()
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
-
-
-
-
-
-
-/*
-    while (true)
-    {
-        LCD.Clear();
-        LCD.Write("Touch to forward 15 inches");
-        while (!LCD.Touch(&x, &y))
-        {
-        }
-        //driveDistancePID(7, 15);
-        driveDistance(turnMotorSpeed, 15);
-
-        LCD.Clear();
-        LCD.Write("Touch to go again");
-
-        while (!LCD.Touch(&x, &y))
-        {
-        }
-
-        LCD.WriteLine("Going");
-        //driveDistancePID(7, 15);
-        driveDistance(turnMotorSpeed, 15);
-
-        Sleep(2.0);
-
-        
-        
-        LCD.Clear();
-        LCD.Write("Touch to forward 15 inches (faster)");
-        while (!LCD.Touch(&x, &y))
-        {
-        }
-        //driveDistancePID(7, 15);
-        driveDistance(motorSpeed, 15);
-
-        LCD.Clear();
-        LCD.Write("Touch to go again (faster)");
-
-        while (!LCD.Touch(&x, &y))
-        {
-        }
-
-        LCD.WriteLine("Going");
-        //driveDistancePID(7, 15);
-        driveDistance(motorSpeed, 15);
-
-        Sleep(2.0);
-    }
-
-
-*/
-
-
-
-
 
 
 
@@ -727,6 +666,7 @@ void ERCMain()
     float tableToWindowBackDist = 11.7;
     float appleBucketDistance = 7.2;
     float rampAngle = 63;
+    float windowOpenDist = 10;
 
     switch (courseLetter)
     {
@@ -767,8 +707,9 @@ void ERCMain()
         break;
     case 'H':
         compostForwardDistance = 3.5;
-        appleBucketDistance = 7.1;
+        appleBucketDistance = 6.9;
         tableToWindowBackDist = 11.6;
+        windowOpenDist = 9;
         break;
     }
 
@@ -851,7 +792,7 @@ void ERCMain()
 
     // Turn to table
 
-    turnCenter(turnMotorSpeed, 98);
+    turnCenter(turnMotorSpeed, 95);
     bumpDriveForward(motorSpeed);
     //driveTime(motorSpeed, 1);
 
@@ -946,6 +887,7 @@ void ERCMain()
         turnCenter(turnMotorSpeed, 11);
         driveTime(37, 1.2);
         driveTime(-37, 1.2);
+        turnCenter(motorSpeed, 3);
     }
 
     // Drive to back wall.
