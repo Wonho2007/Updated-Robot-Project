@@ -274,14 +274,14 @@ void bumpDriveBack(int percent)
         // If either lever is down, wait 5 seconds before breaking out
         if (!backLeftBumper.Value() || !backRightBumper.Value())
         {
-            if (TimeNow() - startTime > 5)
+            if (TimeNow() - startTime > 4)
             {
                 break;
             }
         }
 
         // break out if going backwards for 10 sec
-        if (TimeNow() - startTime > 10)
+        if (TimeNow() - startTime > 6)
         {
             break;
         }
@@ -300,7 +300,7 @@ void bumpDriveBackLeft(int percent)
     while (backLeftBumper.Value())
     {
         // break out if going backwards for 5 sec
-        if (TimeNow() - startTime > 5)
+        if (TimeNow() - startTime > 3)
         {
             break;
         }
@@ -359,17 +359,17 @@ void bumpDriveForward(int percent)
 
         
 
-        // If either bump is down, wait 5 seconds before breaking out
+        // If either bump is down, wait 2 seconds before breaking out
         if (!frontLeftBumper.Value() || !frontRightBumper.Value())
         {
-            if (TimeNow() - startTime > 5)
+            if (TimeNow() - startTime > 2)
             {
                 break;
             }
         }
 
-        // break out if going backwards for 10 sec
-        if (TimeNow() - startTime > 10)
+        // break out if going backwards for 4 sec
+        if (TimeNow() - startTime > 4)
         {
             break;
         }
@@ -486,7 +486,7 @@ void hitLeverC(int percent, int upDegrees)
     // turn to get under lever
     turnCenter(percent, 5);
     driveDistance(percent, 4.5);
-    turnCenter(percent, -10);
+    turnCenter(percent, -15);
 
     arm.SetDegree(upDegrees);
     Sleep(0.1);
@@ -594,7 +594,6 @@ void ERCMain()
 
     int x, y; // for touch screen
 
-
     // Initialize the screen
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
@@ -667,23 +666,25 @@ void ERCMain()
     float appleBucketDistance = 7.2;
     float rampAngle = 63;
     float windowOpenDist = 10;
+    float wallWindowForward = 6.9;
 
     switch (courseLetter)
     {
     case 'A':
         compostForwardDistance = 3.5;
-        appleBucketDistance = 7.2;
-        tableToWindowBackDist = 11.7;
+        appleBucketDistance = 6.7;
+        tableToWindowBackDist = 11.5;
         break;
     case 'B':
         compostForwardDistance = 3.5;
-        appleBucketDistance = 7.2;
+        appleBucketDistance = 6.7;
+        wallWindowForward = 7.1;
         tableToWindowBackDist = 11.7;
         break;
     case 'C':
-        compostForwardDistance = 3.5;
-        appleBucketDistance = 7.2;
-        tableToWindowBackDist = 11.7;
+        compostForwardDistance = 3.2;
+        appleBucketDistance = 6.6;
+        tableToWindowBackDist = 11.3;
         break;
     case 'D':
         compostForwardDistance = 3.5;
@@ -693,7 +694,7 @@ void ERCMain()
     case 'E':
         compostForwardDistance = 4.3;
         appleBucketDistance = 6.5;
-        tableToWindowBackDist = 11.9;
+        tableToWindowBackDist = 11.7;
         break;
     case 'F':
         compostForwardDistance = 3.5;
@@ -709,7 +710,9 @@ void ERCMain()
         compostForwardDistance = 3.5;
         appleBucketDistance = 6.9;
         tableToWindowBackDist = 11.6;
-        windowOpenDist = 9;
+        wallWindowForward = 7.1;
+        rampAngle = 65;
+        windowOpenDist = 10;
         break;
     }
 
@@ -747,8 +750,8 @@ void ERCMain()
 
     // Turn to left wall to align
     turnCenter(turnMotorSpeed, -90);
-    bumpDriveForward(midMotorSpeed);
-    //driveTime(motorSpeed + 10, 2);
+    bumpDriveForward(motorSpeed);
+    driveTime(fastMotorSpeed, 0.5);
 
     // Drive back
     driveDistance(motorSpeed, -13);
@@ -875,7 +878,7 @@ void ERCMain()
         // LCD.Clear(BLUE);
         LCD.WriteLine("Blue");
         turnCenter(turnMotorSpeed, -11);
-        driveTime(37, 1);
+        driveTime(37, 1.5);
 
         driveDistance(motorSpeed, -1);
         turnCenter(turnMotorSpeed, 11);
@@ -919,7 +922,7 @@ void ERCMain()
     {
         // Perform actions to flip left lever A
         turnCenter(turnMotorSpeed, -21);
-        driveDistance(motorSpeed, 2);
+        driveDistance(motorSpeed, 1);
         hitLeverA(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
@@ -967,7 +970,7 @@ void ERCMain()
 
     //---Drive to window---
     // Drive off wall, turn back to window
-    driveDistance(motorSpeed, 6.9);
+    driveDistance(motorSpeed, wallWindowForward);
     turnCenter(motorSpeed, -91);
     bumpDriveBackLeft(motorSpeed);
 
@@ -1016,4 +1019,14 @@ void ERCMain()
 
     turnCenter(motorSpeed, 87);
     driveTime(fastMotorSpeed, 4);
+
+
+    //Try to hit the button again
+    driveDistance(motorSpeed, -3);
+    turnCenter(motorSpeed, -25);
+    driveTime(fastMotorSpeed, 2);
+
+    driveDistance(motorSpeed, -3);
+    turnCenter(motorSpeed, -40);
+    driveTime(fastMotorSpeed, 2);
 }
