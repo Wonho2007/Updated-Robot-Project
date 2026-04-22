@@ -667,6 +667,7 @@ void ERCMain()
     float rampAngle = 63;
     float windowOpenDist = 10;
     float wallWindowForward = 6.9;
+    float appleBucketPickupForward = 3.9;
 
     switch (courseLetter)
     {
@@ -674,6 +675,7 @@ void ERCMain()
         compostForwardDistance = 3.5;
         appleBucketDistance = 6.7;
         tableToWindowBackDist = 11.5;
+        wallWindowForward = 7.1;
         break;
     case 'B':
         compostForwardDistance = 3.5;
@@ -681,7 +683,8 @@ void ERCMain()
         wallWindowForward = 7.1;
         tableToWindowBackDist = 11.7;
         break;
-    case 'C':
+    case 'C': 
+        //Lever C didn't turn enough under lever to lift
         compostForwardDistance = 3.2;
         appleBucketDistance = 6.6;
         tableToWindowBackDist = 11.3;
@@ -690,6 +693,7 @@ void ERCMain()
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         tableToWindowBackDist = 11.7;
+        appleBucketPickupForward = 3.7;
         break;
     case 'E':
         compostForwardDistance = 4.3;
@@ -764,7 +768,7 @@ void ERCMain()
     // Pick up bucket
     arm.SetDegree(parallelDegrees);
     Sleep(0.2);
-    driveDistance(motorSpeed, 3.9); // OG 3.5
+    driveDistance(motorSpeed, appleBucketPickupForward); // OG 3.5
 
     Sleep(0.2);
     LCD.WriteLine("raise arm");
