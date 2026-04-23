@@ -578,7 +578,7 @@ void ERCMain()
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
     const float rampDistance = 32;
-    const float tableToLeverBack = 6.5; //OG 7
+    const float tableToLeverBack = 6.3; //OG 7
     const float tableToHumidifierBack = 1.75;
     const float windowCloseDist = 9.5;
     const float cdsRedHighThresh = 0.55;
@@ -590,9 +590,9 @@ void ERCMain()
     const int compostForward = 0;
     const int compostBackward = 180;
 
-    const int windowServoClose = 145;
-    const int windowServoOpen = 66;
-    const int windowServoHide = 9;
+    const int windowServoClose = 162;
+    const int windowServoOpen = 50;
+    const int windowServoHide = 0;
 
     int x, y; // for touch screen
 
@@ -611,6 +611,7 @@ void ERCMain()
     windowServo.SetMin(700);
     windowServo.SetMax(2200);
     windowServo.SetDegree(windowServoHide);
+
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
@@ -664,7 +665,7 @@ void ERCMain()
     // Drive forward
     float compostForwardDistance = 3.5;
     float tableToWindowBackDist = 12.1;
-    float appleBucketDistance = 7.2;
+    float appleBucketDistance = 7.5;
     float rampAngle = 62;
     float windowOpenDist = 10;
     float wallWindowForward = 6.9;
@@ -706,7 +707,6 @@ void ERCMain()
         break;
     case 'G':
         compostForwardDistance = 3.6;
-        appleBucketDistance = 7.0;
         tableToWindowBackDist = 12.1;
         break;
     case 'H':
@@ -764,6 +764,12 @@ void ERCMain()
     turnCenter(turnMotorSpeed, -90);
 
     // Pick up bucket
+    arm.SetDegree(180);
+    Sleep(0.3);
+    arm.SetDegree(parallelDegrees);
+    Sleep(0.3);
+    arm.SetDegree(180);
+    Sleep(0.3);
     arm.SetDegree(parallelDegrees);
     Sleep(0.2);
     driveDistance(motorSpeed, appleBucketPickupForward); // OG 3.5
@@ -896,7 +902,7 @@ void ERCMain()
     }
 
     // Drive to back wall.
-    driveDistance(fastMotorSpeed, -14);
+    driveDistance(fastMotorSpeed, -12);
     bumpDriveBack(motorSpeed);
 
 
@@ -1029,7 +1035,7 @@ void ERCMain()
     // Back off wall, drive to hit button
     driveDistance(motorSpeed, -1);
 
-    turnCenter(motorSpeed, 85);
+    turnCenter(motorSpeed, 83);
     driveTime(fastMotorSpeed, 3);
 
 
