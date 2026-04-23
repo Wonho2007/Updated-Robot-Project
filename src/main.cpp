@@ -425,7 +425,7 @@ void hitLeverA(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(3.0);
+    Sleep(3.1);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -451,7 +451,7 @@ void hitLeverB(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(3.0);
+    Sleep(3.1);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -478,7 +478,7 @@ void hitLeverC(int percent, int upDegrees)
     arm.SetDegree(180);
     Sleep(0.5);
     driveDistance(percent, -4);
-    Sleep(3.0);
+    Sleep(3.1);
 
     arm.SetDegree(150);
     Sleep(0.1);
@@ -675,13 +675,13 @@ void ERCMain()
     {
     case 'A':
         compostForwardDistance = 3.5;
-        appleBucketDistance = 6.7;
-        tableToWindowBackDist = 11.5;
+        appleBucketDistance = 6.9;
+        tableToWindowBackDist = 12;
         wallWindowForward = 7.1;
         break;
     case 'B':
         compostForwardDistance = 3.5;
-        appleBucketDistance = 6.7;
+        appleBucketDistance = 6.9;
         wallWindowForward = 7.1;
         break;
     case 'C': 
@@ -689,7 +689,7 @@ void ERCMain()
         compostForwardDistance = 3.2;
         appleBucketDistance = 6.6;
         rampAngle = 61;
-        tableToWindowBackDist = 11.3;
+        tableToWindowBackDist = 11.9;
         break;
     case 'D':
         compostForwardDistance = 3.5;
@@ -707,14 +707,11 @@ void ERCMain()
         break;
     case 'G':
         compostForwardDistance = 3.6;
-        tableToWindowBackDist = 12.1;
         break;
     case 'H':
         compostForwardDistance = 3.5;
         appleBucketDistance = 7.4;
-        tableToWindowBackDist = 11.6;
         wallWindowForward = 7.1;
-        rampAngle = 65;
         break;
     }
 
@@ -934,8 +931,8 @@ void ERCMain()
         hitLeverA(motorSpeed, parallelDegrees);
 
         // Turn back and align with wall for button
-        turnCenter(turnMotorSpeed, 32);
-        driveDistance(fastMotorSpeed, -7);
+        turnCenter(turnMotorSpeed, 52);
+        driveDistance(fastMotorSpeed, -8);
         turnCenter(turnMotorSpeed, -62);
 
         bumpDriveBack(motorSpeed);
