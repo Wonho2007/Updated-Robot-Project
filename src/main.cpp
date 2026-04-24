@@ -577,7 +577,7 @@ void ERCMain() //12 Volts
     const int windowSpeed = 35;
     const int rampMotorSpeed = 70;
     const int fastMotorSpeed = 60;
-    const float rampDistance = 32;
+    const float rampDistance = 34;
     const float tableToLeverBack = 6.3; //OG 7
     const float tableToHumidifierBack = 1.75;
     const float windowCloseDist = 9.5;
@@ -672,7 +672,7 @@ void ERCMain() //12 Volts
 
     switch (courseLetter)
     {
-    case 'A': //A little chopped?
+    case 'A': //A little chopped? Ramp angle lowered. Table window lowered.
         appleBucketDistance = 6.9;
         rampAngle = 60;
         tableToWindowBackDist = 11.9;
@@ -692,9 +692,10 @@ void ERCMain() //12 Volts
         appleBucketPickupForward = 3.7;
         rampAngle = 63;
         break;
-    case 'E':
+    case 'E': //88, ramp angle lowered
         compostForwardDistance = 4.3;
         appleBucketDistance = 6.5;
+        rampAngle = 60;
         break;
     case 'F':
         appleBucketDistance = 7.2;
