@@ -435,7 +435,7 @@ void hitLeverA(int percent, int upDegrees)
     // turn to get under lever
     turnCenter(percent, 5);
     driveDistance(percent, 4);
-    turnCenter(percent, -15);
+    turnCenter(percent, -18);
 
     arm.SetDegree(upDegrees);
     Sleep(0.1);
@@ -672,9 +672,10 @@ void ERCMain() //12 Volts
 
     switch (courseLetter)
     {
-    case 'A':
+    case 'A': //A little chopped?
         appleBucketDistance = 6.9;
-        tableToWindowBackDist = 12;
+        rampAngle = 60;
+        tableToWindowBackDist = 11.9;
         wallWindowForward = 7.1;
         break;
     case 'B': //Perfect
@@ -885,8 +886,8 @@ void ERCMain() //12 Volts
         // LCD.Clear(RED);
         LCD.WriteLine("Red");
         turnCenter(turnMotorSpeed, 11);
-        driveTime(32, 1.2);
-        driveTime(-32, 1.2);
+        driveTime(29, 1.2);
+        driveTime(-29, 1.2);
         turnCenter(motorSpeed, 3);
     }
 
@@ -918,7 +919,7 @@ void ERCMain() //12 Volts
     if (correctLever == 0)
     {
         // Perform actions to flip left lever A
-        turnCenter(turnMotorSpeed, -18);
+        turnCenter(turnMotorSpeed, -19);
         driveDistance(motorSpeed, 1);
         hitLeverA(motorSpeed, parallelDegrees);
 
