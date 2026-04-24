@@ -612,7 +612,6 @@ void ERCMain()
     windowServo.SetMax(2200);
     windowServo.SetDegree(windowServoHide);
 
-
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
 
@@ -674,25 +673,21 @@ void ERCMain()
     switch (courseLetter)
     {
     case 'A':
-        compostForwardDistance = 3.5;
         appleBucketDistance = 6.9;
         tableToWindowBackDist = 12;
         wallWindowForward = 7.1;
         break;
     case 'B':
-        compostForwardDistance = 3.5;
         appleBucketDistance = 6.9;
         wallWindowForward = 7.1;
         break;
     case 'C': 
-        //Lever C didn't turn enough under lever to lift
         compostForwardDistance = 3.2;
-        appleBucketDistance = 6.6;
+        appleBucketDistance = 6.8;
         rampAngle = 61;
         tableToWindowBackDist = 11.9;
         break;
     case 'D':
-        compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         appleBucketPickupForward = 3.7;
         rampAngle = 63;
@@ -702,14 +697,12 @@ void ERCMain()
         appleBucketDistance = 6.5;
         break;
     case 'F':
-        compostForwardDistance = 3.5;
         appleBucketDistance = 7.2;
         break;
     case 'G':
         compostForwardDistance = 3.6;
         break;
     case 'H':
-        compostForwardDistance = 3.5;
         appleBucketDistance = 7.4;
         wallWindowForward = 7.1;
         break;
@@ -768,7 +761,7 @@ void ERCMain()
     arm.SetDegree(180);
     Sleep(0.3);
     arm.SetDegree(parallelDegrees);
-    Sleep(0.2);
+    Sleep(0.3);
     driveDistance(motorSpeed, appleBucketPickupForward); // OG 3.5
 
     Sleep(0.2);
