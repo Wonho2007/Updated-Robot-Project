@@ -685,7 +685,6 @@ void ERCMain()
         compostForwardDistance = 3.2;
         appleBucketDistance = 6.8;
         rampAngle = 61;
-        tableToWindowBackDist = 11.9;
         break;
     case 'D':
         appleBucketDistance = 7.2;
