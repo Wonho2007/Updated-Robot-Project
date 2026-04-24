@@ -568,7 +568,7 @@ void windowDrive(int percent, float inches, char openOrClose)
     left_motor.Stop();   
 }
 
-void ERCMain()
+void ERCMain() //12 Volts
 {
     const int turnMotorSpeed = 25;
     const int slowMotorSpeed = 20; // Input power level here
@@ -677,16 +677,16 @@ void ERCMain()
         tableToWindowBackDist = 12;
         wallWindowForward = 7.1;
         break;
-    case 'B':
+    case 'B': //Perfect
         appleBucketDistance = 6.9;
         wallWindowForward = 7.1;
         break;
-    case 'C': 
+    case 'C': //Perfect
         compostForwardDistance = 3.2;
         appleBucketDistance = 6.8;
         rampAngle = 61;
         break;
-    case 'D':
+    case 'D': //Perfect
         appleBucketDistance = 7.2;
         appleBucketPickupForward = 3.7;
         rampAngle = 63;
