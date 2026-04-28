@@ -581,8 +581,9 @@ void ERCMain() //12 Volts
     const float tableToLeverBack = 6.3; //OG 7
     const float tableToHumidifierBack = 1.75;
     const float windowCloseDist = 9.5;
-    const float cdsRedHighThresh = 0.55;
-    const float cdsBlueHighThresh = 1.2;
+    const float startThresh = 1.5;
+    const float cdsRedHighThresh = 0.60;
+    const float cdsBlueHighThresh = 1.5;
     const float upDegrees = 43;        // og 43
     const float appleUpDegrees = 95;   // OG 95
     const float parallelDegrees = 150; // OG 150
@@ -600,6 +601,7 @@ void ERCMain() //12 Volts
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
 
+
     arm.SetMin(800);
     arm.SetMax(2500);
     arm.SetDegree(0);
@@ -614,7 +616,6 @@ void ERCMain() //12 Volts
 
     Sleep(1.0);
     float cdsValue = cdsCell.Value();
-
 
 
 
@@ -638,11 +639,11 @@ void ERCMain() //12 Volts
     while (!lightGoodTwice)
     {
         cdsValue = cdsCell.Value();
-        if (cdsValue < cdsRedHighThresh)
+        if (cdsValue < startThresh)
         {
             Sleep(0.1);
             cdsValue = cdsCell.Value();
-            if (cdsValue < cdsRedHighThresh)
+            if (cdsValue < startThresh)
             {
                 lightGoodTwice = true;
             }
@@ -679,7 +680,8 @@ void ERCMain() //12 Volts
         wallWindowForward = 7.1;
         break;
     case 'B': //Perfect
-        appleBucketDistance = 6.9;
+        compostForwardDistance = 3.7; //OG none
+        appleBucketDistance = 7.2; //OG 6.9
         wallWindowForward = 7.1;
         break;
     case 'C': //Perfect
@@ -887,8 +889,8 @@ void ERCMain() //12 Volts
         // LCD.Clear(RED);
         LCD.WriteLine("Red");
         turnCenter(turnMotorSpeed, 11);
-        driveTime(29, 1.2);
-        driveTime(-29, 1.2);
+        driveTime(27, 1.2);
+        driveTime(-27, 1.2);
         turnCenter(motorSpeed, 3);
     }
 
